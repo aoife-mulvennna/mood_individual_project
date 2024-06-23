@@ -1,34 +1,67 @@
-import logo from './logo.svg';
 import './App.css';
-import {Logger} from './Logger';
-import {Viewer} from './Viewer';
+import qubLogo from './Photos/QUB_Logo.jpg';
+import { Logger } from './Logger';
+import { Viewer } from './Viewer';
+import { DailyTrack } from './DailyTrack/DailyTrack';
+import { Login } from './Login/Login';
 import { BrowserRouter, Route, Routes, NavLink } from 'react-router-dom';
+import AddStudent from './AddStudent/AddStudent';
+
+import React, { useState } from 'react';
+import useToken from './useToken';
 
 function App() {
+  const { token, setToken } = useToken();
+
+  if (!token) {
+    return <Login setToken={setToken} />
+  }
   return (
     <BrowserRouter>
-    <div className="App container">
-      <h3 className="d-flex justify-content-center m-3">Mood Tracker</h3>
-      <nav className="navbar navbar-expand-sm bg-light navbar-dark">
-        <ul className="navbar-nav">
-          <li className="nav-item m-1">
-            <NavLink className="btn btn-light btn-outline-primary" to="/logger">
-              Logger
-            </NavLink>
-          </li>
-          <li className="nav-item m-1">
-            <NavLink className="btn btn-light btn-outline-primary" to="/viewer">
-              Viewer
-            </NavLink>
-          </li>
-        </ul>
-      </nav>
-      <Routes>
-        <Route path='/logger' Component={Logger} />
-        <Route path='/viewer' Component={Viewer} />
-      </Routes>
-    </div>
-  </BrowserRouter>
+      <div className="App container">
+        <div className="Top">
+          <div className="logo-container">
+            <img src={qubLogo} className="logo" alt="qub logo" />
+          </div>
+          <h3 className="text-center mb-4 Title">Mood Tracker</h3>
+        </div>
+        <div className="nav-container">
+          <nav className="navbar navbar-expand-sm bg-light navbar-dark">
+            <ul className="navbar-nav">
+              <li className="nav-item m-1">
+                <NavLink className="btn btn-light btn-outline-primary" to="/logger">
+                  Logger
+                </NavLink>
+              </li>
+              <li className="nav-item m-1">
+                <NavLink className="btn btn-light btn-outline-primary" to="/viewer">
+                  Viewer
+                </NavLink>
+              </li>
+              <li className="nav-item m-1">
+                <NavLink className="btn btn-light btn-outline-primary" to="/daily">
+                  Daily Tracker
+                </NavLink>
+              </li>
+              <li className="nav-item m-1">
+                <NavLink className="btn btn-light btn-outline-primary" to="/add-student">
+                  Add Student
+                </NavLink>
+              </li>
+            </ul>
+          </nav>
+
+
+        </div>
+        <Routes>
+        <Route path='/logger' element={<Logger />} />
+          <Route path='/viewer' element={<Viewer />} />
+          <Route path='/daily' element={<DailyTrack />} />
+          <Route path='/login' element={<Login setToken={setToken} />} />
+          <Route path='/add-student' element={<AddStudent />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 

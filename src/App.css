@@ -36,3 +36,25 @@
     transform: rotate(360deg);
   }
 }
+
+.logo {
+  width: 200px;
+  height: auto;
+  margin: 2%;
+  float: left;
+}
+.Top {
+  padding: 20px; /* Adjust margin as needed */
+  display: flex;
+
+}
+.navbar {
+  width: 100%;
+  text-align: center;
+}
+.Title{
+  width: 200px;
+  height: auto;
+  margin: 2%;
+  float: center;
+}
