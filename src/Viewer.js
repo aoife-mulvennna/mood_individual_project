@@ -6,9 +6,9 @@ export class Viewer extends Component {
 
         this.state = {
             moods: [],
-            mood_id: 0,
-            mood_name: "",
-            mood_time: ""
+            // mood_id: 0,
+            // mood_name: "",
+            // mood_time: ""
         }
     }
     refreshList() {

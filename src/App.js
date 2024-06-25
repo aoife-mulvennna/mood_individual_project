@@ -1,13 +1,11 @@
 import './App.css';
 import qubLogo from './Photos/QUB_Logo.jpg';
-import { Logger } from './Logger';
-import { Viewer } from './Viewer';
 import { DailyTrack } from './DailyTrack/DailyTrack';
-import { Login } from './Login/Login';
+import Login from './Login/Login';
 import { BrowserRouter, Route, Routes, NavLink } from 'react-router-dom';
 import AddStudent from './AddStudent/AddStudent';
 
-import React, { useState } from 'react';
+import React from 'react';
 import useToken from './useToken';
 
 function App() {
@@ -29,16 +27,6 @@ function App() {
           <nav className="navbar navbar-expand-sm bg-light navbar-dark">
             <ul className="navbar-nav">
               <li className="nav-item m-1">
-                <NavLink className="btn btn-light btn-outline-primary" to="/logger">
-                  Logger
-                </NavLink>
-              </li>
-              <li className="nav-item m-1">
-                <NavLink className="btn btn-light btn-outline-primary" to="/viewer">
-                  Viewer
-                </NavLink>
-              </li>
-              <li className="nav-item m-1">
                 <NavLink className="btn btn-light btn-outline-primary" to="/daily">
                   Daily Tracker
                 </NavLink>
@@ -54,8 +42,6 @@ function App() {
 
         </div>
         <Routes>
-        <Route path='/logger' element={<Logger />} />
-          <Route path='/viewer' element={<Viewer />} />
           <Route path='/daily' element={<DailyTrack />} />
           <Route path='/login' element={<Login setToken={setToken} />} />
           <Route path='/add-student' element={<AddStudent />} />

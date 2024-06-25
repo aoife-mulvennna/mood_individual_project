@@ -78,7 +78,6 @@ const AddStudentForm = () => {
 
             const data = await response.json();
             if (!response.ok) {
-                const errorData = await response.json();
                 throw new Error(data.message || 'Failed to add student');
             }
 

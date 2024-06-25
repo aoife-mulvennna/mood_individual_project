@@ -1,52 +1,49 @@
 import React, { useState } from 'react';
-import { variables } from '../Variables.js';
 import './Login.css';
-import PropTypes from 'prop-types';
 
-async function loginUser(credentials) {
-  return fetch('http://localhost:3001/api/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(credentials)
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Invalid credentials');
-      }
-      return response.json();
-    })
-    .catch(error => {
-      alert(error.message);
-      throw error;
-    })
-}
+const Login = () => {
+  const [student_number, setStudentNumber] = useState('');
+  const [student_password, setStudentPassword] = useState('');
 
-export function Login({ setToken }) {
-  const [studentNumber, setStudentNumber] = useState();
-  const [password, setPassword] = useState();
-
-  const handleSubmit = async e => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const token = await loginUser({
-      studentNumber,
-      password
-    });
-    setToken(token);
-  }
+
+    try {
+      const response = await fetch('http://localhost:3001/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ studentNumber: student_number, student_password: student_password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        sessionStorage.setItem('token', data.token); // Store the token
+
+        window.location.href = '/daily'; // Example redirect
+        console.log('Login successful');
+      } else {
+        const errorText = await response.text(); 
+        alert(`Login failed: ${errorText}`);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('An error occurred while logging in');
+    }
+  };
 
   return (
     <div className="login-wrapper">
       <h3>Please Log In </h3>
-      <form onSubmit={handleSubmit} >
+      <form onSubmit={handleLogin} >
         <label>
           <p>Student Number</p>
           <input type="number" onChange={e => setStudentNumber(e.target.value)} required />
         </label>
         <label>
           <p>Password</p>
-          <input type="password" onChange={e => setPassword(e.target.value)} required />
+          <input type="password" onChange={e => setStudentPassword(e.target.value)} required />
         </label>
         <div>
           <button type="submit">Submit</button>
@@ -56,10 +53,7 @@ export function Login({ setToken }) {
   )
 }
 
-Login.propTypes = {
-  setToken: PropTypes.func.isRequired
-}
-
+export default Login;
 
 
 // https://www.digitalocean.com/community/tutorials/how-to-add-login-authentication-to-react-applications

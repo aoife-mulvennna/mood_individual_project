@@ -1,31 +1,63 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { variables } from '../Variables.js';
+import { jwtDecode } from 'jwt-decode';
 
-export class DailyTrack extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            moods: [],
-            selectedMood: '',
-            // selectedMoodId: null,
-            selectedExerciseDuration: 0,
-            selectedSleepDuration: 0,
-            selectedSocialisation: null
-        };
-        console.log("Constructor: Component Initialized");
-        this.handleMoodSelection = this.handleMoodSelection.bind(this);
-        this.handleExerciseDurationChange = this.handleExerciseDurationChange.bind(this);
-        this.handleSleepDurationChange = this.handleSleepDurationChange.bind(this);
-        this.handleSocialisationChange = this.handleSocialisationChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+const DailyTrack = () => {
+    const [moods, setMoods] = useState([]);
+    const [selectedMood, setSelectedMood] = useState('');
+    const [selectedExerciseDuration, setSelectedExerciseDuration] = useState(0);
+    const [selectedSleepDuration, setSelectedSleepDuration] = useState(0);
+    const [selectedSocialisation, setSelectedSocialisation] = useState(null);
+    const [studentName, setStudentName] = useState('');
+    const [studentId, setStudentId] = useState('');
+    const [token, setToken] = useState('');
+    const [alreadyTracked, setAlreadyTracked] = useState(false);
+
+    useEffect(() => {
+        const storedToken = sessionStorage.getItem('token');
+        console.log('The token is Token:', storedToken);
+
+        if (storedToken) {
+            try {
+                const decoded = jwtDecode(storedToken);
+                console.log('The token Decoded:', decoded);
+                setStudentName(decoded.studentName);
+                setStudentId(decoded.studentId);
+                setToken(storedToken); // Set token in state
+            }
+            catch (error) {
+                console.error('Error decoding token:', error);
+            }
+        }
+
+        checkTrackedStatus();
+        refreshList();
+    }, []);
+
+    const checkTrackedStatus = () => {
+        fetch(variables.API_URL + 'mood', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+           .then(data => {
+    console.log('Check Tracked Status:', data);
+    if (data.status === 409 && data.message === 'Already tracked today') {
+        setAlreadyTracked(true); // Set state to true to handle UI accordingly
     }
+})
+            .catch(error => {
+                console.error('Error checking tracked status:', error);
+            });
+    };
 
-
-    componentDidMount() {
-        this.refreshList();
-    }
-
-    refreshList() {
+    const refreshList = () => {
         fetch(variables.API_URL + 'mood')
             .then(response => {
                 if (!response.ok) {
@@ -34,99 +66,93 @@ export class DailyTrack extends Component {
                 return response.json();
             })
             .then(data => {
-                this.setState({ moods: data });
+                setMoods(data);
             })
             .catch(error => {
                 console.error('There was an error!', error);
             });
     }
 
-    handleMoodSelection(mood) {
-        this.setState({ selectedMood: mood.mood_name });
+    const handleMoodSelection = (mood) => {
+        setSelectedMood(mood.mood_name);
     }
+    const handleExerciseDurationChange = (event) => {
+        setSelectedExerciseDuration(event.target.value);
+    };
+
+    const handleSleepDurationChange = (event) => {
+        setSelectedSleepDuration(event.target.value);
+    };
+
+    const handleSocialisationChange = (value) => {
+        setSelectedSocialisation(value);
+    };
 
 
-    handleExerciseDurationChange(event) {
-        this.setState({ selectedExerciseDuration: event.target.value });
-    }
-
-    handleSleepDurationChange(event) {
-        this.setState({ selectedSleepDuration: event.target.value });
-    }
-
-    handleSocialisationChange(value) {
-        this.setState({ selectedSocialisation: value });
-    }
-
-    handleSubmit() {
+    const handleSubmit = () => {
+        if (!token) {
+            alert('No token found, please log in again.');
+            return;
+        }
         console.log("HandleSubmit: Submitting data...");
+        console.log("Token being sent:", token);
+
         fetch(variables.API_URL + 'mood', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
-                student_id: 1,
-                mood_name: this.state.selectedMood,
-                exercise_duration: this.state.selectedExerciseDuration,
-                sleep_duration: this.state.selectedSleepDuration,
-                socialisation: this.state.selectedSocialisation
+                student_id: studentId,
+                mood_name: selectedMood,
+                exercise_duration: selectedExerciseDuration,
+                sleep_duration: selectedSleepDuration,
+                socialisation: selectedSocialisation
             })
         })
-            .then(res => res.json())
-            .then((result) => {
-                alert(result.message);
-                this.refreshList();
+            .then(async res => {
+                if (!res.ok) {
+                    const errorText = await res.text(); // Read response text for non-JSON responses
+                    throw new Error(errorText);
+                }
+                const data = await res.json();
+                alert(data.message);
+                refreshList();
             })
             .catch((error) => {
-                alert('Failed');
-                console.error('Error:', error);
+                alert('Failed: ' + error.message);
+                console.error('Error:', error.message);
             });
     }
 
-    render() {
-        console.log('Render: component is rendering');
-        console.log("Current state: ", this.state);
+    if (alreadyTracked) {
         return (
             <div>
                 <h3>This is the Daily Tracker page</h3>
+                <h3>Hi {studentName}</h3>
+                <p>Sorry, you have already tracked today!</p>
+            </div>
+        );
+    } else {
+
+        return (
+            <div>
+                <h3>This is the Daily Tracker page</h3>
+                <h3>Hi {studentName}</h3>
                 <form>
-                    {/* <div>How did you feel overall today?</div>
-                    <button type="button"
-                        className={`btn btn-primary m-2 ${this.state.selectedMood === 'Sad' ? 'btn-secondary' : ''}`}
-                        onClick={() => this.handleMoodSelection('Sad')}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-emoji-frown" viewBox="0 0 16 16 ">
-                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                            <path d="M4.285 12.433a.5.5 0 0 0 .683-.183A3.5 3.5 0 0 1 8 10.5c1.295 0 2.426.703 3.032 1.75a.5.5 0 0 0 .866-.5A4.5 4.5 0 0 0 8 9.5a4.5 4.5 0 0 0-3.898 2.25.5.5 0 0 0 .183.683M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5m4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5" />
-                        </svg>
-                    </button>
-                    <button type="button"
-                        className={`btn btn-primary m-2 ${this.state.selectedMood === 'Okay' ? 'btn-secondary' : ''}`}
-                        onClick={() => this.handleMoodSelection('Okay')}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" className="bi bi-emoji-neutral" viewBox="0 0 16 16">
-                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                            <path d="M4 10.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5m3-4C7 5.672 6.552 5 6 5s-1 .672-1 1.5S5.448 8 6 8s1-.672 1-1.5m4 0c0-.828-.448-1.5-1-1.5s-1 .672-1 1.5S9.448 8 10 8s1-.672 1-1.5" />
-                        </svg>
-                    </button>
-                    <button type="button"
-                        className={`btn btn-primary m-2 ${this.state.selectedMood === 'Happy' ? 'btn-secondary' : ''}`}
-                        onClick={() => this.handleMoodSelection('Happy')}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-emoji-smile" viewBox="0 0 16 16">
-                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                            <path d="M4.285 9.567a.5.5 0 0 1 .683.183A3.5 3.5 0 0 0 8 11.5a3.5 3.5 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5m4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5" />
-                        </svg>
-                    </button> */}
                     <div>How did you feel overall today?</div>
-                    {this.state.moods.length === 0 ? (
+
+                    {moods.length === 0 ? (
                         <p>Loading moods...</p>
                     ) : (
-                        this.state.moods.map(mood => (
+                        moods.map(mood => (
                             <button
                                 key={mood.mood_id}
                                 type="button"
-                                className={`btn btn-primary m-2 ${this.state.selectedMood === mood.mood_name ? 'btn-secondary' : ''}`}
-                                onClick={() => this.handleMoodSelection(mood)}
+                                className={`btn btn-primary m-2 ${selectedMood === mood.mood_name ? 'btn-secondary' : ''}`}
+                                onClick={() => handleMoodSelection(mood)}
                             >
                                 {mood.mood_name}
                             </button>
@@ -137,25 +163,25 @@ export class DailyTrack extends Component {
                     <input
                         type="number"
                         name="exercise_duration"
-                        value={this.state.selectedExerciseDuration}
-                        onChange={this.handleExerciseDurationChange}
+                        value={selectedExerciseDuration}
+                        onChange={handleExerciseDurationChange}
                     />
                     <div>How many hours of sleep did you get last night?</div>
                     <input
                         type="number"
                         name="sleep_duration"
-                        value={this.state.selectedSleepDuration}
-                        onChange={this.handleSleepDurationChange}
+                        value={selectedSleepDuration}
+                        onChange={handleSleepDurationChange}
                     />
                     <div>Did you complete a non-physical social activity today?</div>
                     <button type="button"
-                        className={`btn btn-primary m-2 ${this.state.selectedSocialisation === true ? 'btn-secondary' : ''}`}
-                        onClick={() => this.handleSocialisationChange(true)}>
+                        className={`btn btn-primary m-2 ${selectedSocialisation === true ? 'btn-secondary' : ''}`}
+                        onClick={() => handleSocialisationChange(true)}>
                         Yes
                     </button>
                     <button type="button"
-                        className={`btn btn-primary m-2 ${this.state.selectedSocialisation === false ? 'btn-secondary' : ''}`}
-                        onClick={() => this.handleSocialisationChange(false)}
+                        className={`btn btn-primary m-2 ${selectedSocialisation === false ? 'btn-secondary' : ''}`}
+                        onClick={() => handleSocialisationChange(false)}
                     >
                         No
                     </button>
@@ -175,13 +201,14 @@ export class DailyTrack extends Component {
                     </button>
 
                     <div>
-                        <button type="button" className="btn btn-success m-2" onClick={() => this.handleSubmit()}>
+                        <button type="button" className="btn btn-success m-2" onClick={handleSubmit}>
                             Submit
                         </button>
                     </div>
                 </form>
 
             </div>
-        )
-    }
-}
+        );
+    };
+};
+export { DailyTrack };
