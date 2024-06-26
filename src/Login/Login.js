@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
+
 import './Login.css';
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { setIsLoggedIn } = useAuth();
   const [student_number, setStudentNumber] = useState('');
   const [student_password, setStudentPassword] = useState('');
 
@@ -19,10 +24,10 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
-        sessionStorage.setItem('token', data.token); // Store the token
+setIsLoggedIn(data.token);
+navigate('/dashboard');
+console.log('Login successful');
 
-        window.location.href = '/daily'; // Example redirect
-        console.log('Login successful');
       } else {
         const errorText = await response.text(); 
         alert(`Login failed: ${errorText}`);
@@ -36,14 +41,14 @@ const Login = () => {
   return (
     <div className="login-wrapper">
       <h3>Please Log In </h3>
-      <form onSubmit={handleLogin} >
+      <form className="login-form"  onSubmit={handleLogin} >
         <label>
           <p>Student Number</p>
-          <input type="number" onChange={e => setStudentNumber(e.target.value)} required />
+          <input type="number" onChange={(e) => setStudentNumber(e.target.value)} required />
         </label>
         <label>
           <p>Password</p>
-          <input type="password" onChange={e => setStudentPassword(e.target.value)} required />
+          <input type="password" onChange={(e) => setStudentPassword(e.target.value)} required />
         </label>
         <div>
           <button type="submit">Submit</button>

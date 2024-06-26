@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { variables } from '../Variables.js';
 import { jwtDecode } from 'jwt-decode';
+import "./DailyTrack.css";
 
 const DailyTrack = () => {
     const [moods, setMoods] = useState([]);
@@ -46,12 +47,12 @@ const DailyTrack = () => {
                 }
                 return response.json();
             })
-           .then(data => {
-    console.log('Check Tracked Status:', data);
-    if (data.status === 409 && data.message === 'Already tracked today') {
-        setAlreadyTracked(true); // Set state to true to handle UI accordingly
-    }
-})
+            .then(data => {
+                console.log('Check Tracked Status:', data);
+                if (data.status === 409 && data.message === 'Already tracked today') {
+                    setAlreadyTracked(true); // Set state to true to handle UI accordingly
+                }
+            })
             .catch(error => {
                 console.error('Error checking tracked status:', error);
             });
@@ -138,70 +139,87 @@ const DailyTrack = () => {
     } else {
 
         return (
-            <div>
+            <div className="container">
                 <h3>This is the Daily Tracker page</h3>
                 <h3>Hi {studentName}</h3>
                 <form>
-                    <div>How did you feel overall today?</div>
-
-                    {moods.length === 0 ? (
-                        <p>Loading moods...</p>
-                    ) : (
-                        moods.map(mood => (
-                            <button
-                                key={mood.mood_id}
-                                type="button"
-                                className={`btn btn-primary m-2 ${selectedMood === mood.mood_name ? 'btn-secondary' : ''}`}
-                                onClick={() => handleMoodSelection(mood)}
-                            >
-                                {mood.mood_name}
-                            </button>
-                        ))
-                    )}
-
-                    <div>How many minutes of exercise did you complete today?</div>
+                    <div className="form-group">
+                        <label>How did you feel overall today?</label>
+                        <div className="mood-buttons">
+                            {moods.length === 0 ? (
+                                <p>Loading moods...</p>
+                            ) : (
+                                moods.map(mood => (
+                                    <button
+                                        key={mood.mood_id}
+                                        type="button"
+                                        className={`btn mood-button ${selectedMood === mood.mood_name ? 'btn-secondary' : ''}`}
+                                        onClick={() => handleMoodSelection(mood)}
+                                    >
+                                        {mood.mood_name}
+                                    </button>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                    <div className="form-group">
+                    <label>How many minutes of exercise did you complete today?</label>
                     <input
                         type="number"
                         name="exercise_duration"
                         value={selectedExerciseDuration}
                         onChange={handleExerciseDurationChange}
                     />
-                    <div>How many hours of sleep did you get last night?</div>
+                    </div>
+
+                    <div className="form-group">
+                    <label>How many hours of sleep did you get last night?</label>
                     <input
                         type="number"
                         name="sleep_duration"
                         value={selectedSleepDuration}
                         onChange={handleSleepDurationChange}
                     />
-                    <div>Did you complete a non-physical social activity today?</div>
-                    <button type="button"
-                        className={`btn btn-primary m-2 ${selectedSocialisation === true ? 'btn-secondary' : ''}`}
-                        onClick={() => handleSocialisationChange(true)}>
-                        Yes
-                    </button>
-                    <button type="button"
-                        className={`btn btn-primary m-2 ${selectedSocialisation === false ? 'btn-secondary' : ''}`}
-                        onClick={() => handleSocialisationChange(false)}
-                    >
-                        No
-                    </button>
-                    {/* will need to add in database/api for productivity - ignore for now! */}
-                    <div>Did you feel productive today?</div>
-                    <button type="button" className="btn btn-primary m-2">
-                        Not at all.
-                    </button>
-                    <button type="button" className="btn btn-primary m-2">
-                        I tried..
-                    </button>
-                    <button type="button" className="btn btn-primary m-2">
-                        Super Productive!
-                    </button>
-                    <button type="button" className="btn btn-primary m-2">
-                        Somewhat
-                    </button>
+                    </div>
 
-                    <div>
-                        <button type="button" className="btn btn-success m-2" onClick={handleSubmit}>
+                    <div className="form-group">
+                    <label>Did you complete a non-physical social activity today?</label>
+                    <div className="socialisation-buttons">
+                        <button type="button"
+                            className={`btn social-button ${selectedSocialisation === true ? 'btn-secondary' : ''}`}
+                            onClick={() => handleSocialisationChange(true)}>
+                            Yes
+                        </button>
+                        <button type="button"
+                            className={`btn social-button ${selectedSocialisation === false ? 'btn-secondary' : ''}`}
+                            onClick={() => handleSocialisationChange(false)}
+                        >
+                            No
+                        </button>
+                    </div>
+                    </div>
+
+                    {/* will need to add in database/api for productivity - ignore for now! */}
+                    <div className="form-group">
+                    <label>Did you feel productive today?</label>
+                    <div className="socialisation-buttons">
+                        <button type="button" className="btn productivity-button">
+                            Not at all.
+                        </button>
+                        <button type="button" className="btn productivity-button">
+                            I tried..
+                        </button>
+                        <button type="button" className="btn productivity-button">
+                            Super Productive!
+                        </button>
+                        <button type="button" className="btn productivity-button">
+                            Somewhat
+                        </button>
+                    </div>
+                    </div>
+
+                    <div className="form-group">
+                        <button type="button" className="btn submit-button" onClick={handleSubmit}>
                             Submit
                         </button>
                     </div>
