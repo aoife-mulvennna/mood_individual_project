@@ -55,12 +55,12 @@ input[type="number"] {
 }
 
 .btn-secondary {
-    background-color: #c0392b; /* Red for selected buttons */
+    background-color: #e0220d; /* Red for selected buttons */
     color: white;
 }
 
 .btn-secondary:hover {
-    background-color: #a93226; /* Darker red on hover */
+    background-color: #b71709; /* Darker red on hover */
 }
 
 /* Mood buttons */
@@ -75,10 +75,10 @@ input[type="number"] {
 
 /* Submit button */
 .submit-button {
-    background-color: #db3434; /* Blue submit button */
+    background-color: #e0220d; /* Blue submit button */
     color: white;
 }
 
 .submit-button:hover {
-    background-color: #b42c2c; /* Darker blue on hover */
+    background-color: #b71709; /* Darker blue on hover */
 }

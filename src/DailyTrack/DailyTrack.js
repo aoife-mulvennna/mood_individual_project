@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { variables } from '../Variables.js';
 import { jwtDecode } from 'jwt-decode';
 import "./DailyTrack.css";
@@ -9,6 +9,7 @@ const DailyTrack = () => {
     const [selectedExerciseDuration, setSelectedExerciseDuration] = useState(0);
     const [selectedSleepDuration, setSelectedSleepDuration] = useState(0);
     const [selectedSocialisation, setSelectedSocialisation] = useState(null);
+    const [selectedProductivity, setSelectedProductivity] = useState('');
     const [studentName, setStudentName] = useState('');
     const [studentId, setStudentId] = useState('');
     const [token, setToken] = useState('');
@@ -16,12 +17,12 @@ const DailyTrack = () => {
 
     useEffect(() => {
         const storedToken = sessionStorage.getItem('token');
-        console.log('The token is Token:', storedToken);
+        console.log('Token retrieved from session storage:', storedToken);
 
         if (storedToken) {
             try {
                 const decoded = jwtDecode(storedToken);
-                console.log('The token Decoded:', decoded);
+                console.log('Decoded token:', decoded);
                 setStudentName(decoded.studentName);
                 setStudentId(decoded.studentId);
                 setToken(storedToken); // Set token in state
@@ -31,11 +32,37 @@ const DailyTrack = () => {
             }
         }
 
-        checkTrackedStatus();
-        refreshList();
     }, []);
 
-    const checkTrackedStatus = () => {
+    useEffect(() => {
+        if (studentId) {
+            fetchStudentName(studentId);
+        }
+    }, [studentId]);
+
+    const fetchStudentName = (id) => {
+        fetch(variables.API_URL + `students/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            setStudentName(data.name);
+        })
+        .catch(error => {
+            console.error('Error fetching student name:', error);
+        });
+    };
+
+    const checkTrackedStatus = useCallback(() => {
+        if (!token) return;
+
         fetch(variables.API_URL + 'mood', {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -56,7 +83,14 @@ const DailyTrack = () => {
             .catch(error => {
                 console.error('Error checking tracked status:', error);
             });
-    };
+    }, [token]);
+
+    useEffect(() => {
+        if (token) {
+            checkTrackedStatus();
+        }
+        refreshList();
+    }, [token, checkTrackedStatus]);
 
     const refreshList = () => {
         fetch(variables.API_URL + 'mood')
@@ -67,7 +101,9 @@ const DailyTrack = () => {
                 return response.json();
             })
             .then(data => {
-                setMoods(data);
+                console.log('Fetched moods:', data);
+                const sortedMoods = data.sort((a, b) => a.mood_score - b.mood_score);
+                setMoods(sortedMoods);
             })
             .catch(error => {
                 console.error('There was an error!', error);
@@ -89,15 +125,15 @@ const DailyTrack = () => {
         setSelectedSocialisation(value);
     };
 
+    const handleProductivityChange = (value) => {
+        setSelectedProductivity(value);
+    };
 
     const handleSubmit = () => {
         if (!token) {
             alert('No token found, please log in again.');
             return;
         }
-        console.log("HandleSubmit: Submitting data...");
-        console.log("Token being sent:", token);
-
         fetch(variables.API_URL + 'mood', {
             method: 'POST',
             headers: {
@@ -110,12 +146,14 @@ const DailyTrack = () => {
                 mood_name: selectedMood,
                 exercise_duration: selectedExerciseDuration,
                 sleep_duration: selectedSleepDuration,
-                socialisation: selectedSocialisation
+                socialisation: selectedSocialisation,
+                productivity: selectedProductivity
             })
         })
+
             .then(async res => {
                 if (!res.ok) {
-                    const errorText = await res.text(); // Read response text for non-JSON responses
+                    const errorText = await res.text();
                     throw new Error(errorText);
                 }
                 const data = await res.json();
@@ -126,8 +164,7 @@ const DailyTrack = () => {
                 alert('Failed: ' + error.message);
                 console.error('Error:', error.message);
             });
-    }
-
+    };
     if (alreadyTracked) {
         return (
             <div>
@@ -136,6 +173,7 @@ const DailyTrack = () => {
                 <p>Sorry, you have already tracked today!</p>
             </div>
         );
+
     } else {
 
         return (
@@ -163,59 +201,56 @@ const DailyTrack = () => {
                         </div>
                     </div>
                     <div className="form-group">
-                    <label>How many minutes of exercise did you complete today?</label>
-                    <input
-                        type="number"
-                        name="exercise_duration"
-                        value={selectedExerciseDuration}
-                        onChange={handleExerciseDurationChange}
-                    />
+                        <label>How many minutes of exercise did you complete today?</label>
+                        <input
+                            type="number"
+                            name="exercise_duration"
+                            value={selectedExerciseDuration}
+                            onChange={handleExerciseDurationChange}
+                        />
                     </div>
 
                     <div className="form-group">
-                    <label>How many hours of sleep did you get last night?</label>
-                    <input
-                        type="number"
-                        name="sleep_duration"
-                        value={selectedSleepDuration}
-                        onChange={handleSleepDurationChange}
-                    />
+                        <label>How many hours of sleep did you get last night?</label>
+                        <input
+                            type="number"
+                            name="sleep_duration"
+                            value={selectedSleepDuration}
+                            onChange={handleSleepDurationChange}
+                        />
                     </div>
 
                     <div className="form-group">
-                    <label>Did you complete a non-physical social activity today?</label>
-                    <div className="socialisation-buttons">
-                        <button type="button"
-                            className={`btn social-button ${selectedSocialisation === true ? 'btn-secondary' : ''}`}
-                            onClick={() => handleSocialisationChange(true)}>
-                            Yes
-                        </button>
-                        <button type="button"
-                            className={`btn social-button ${selectedSocialisation === false ? 'btn-secondary' : ''}`}
-                            onClick={() => handleSocialisationChange(false)}
-                        >
-                            No
-                        </button>
-                    </div>
+                        <label>Did you complete a non-physical social activity today?</label>
+                        <div className="socialisation-buttons">
+                            <button type="button"
+                                className={`btn social-button ${selectedSocialisation === true ? 'btn-secondary' : ''}`}
+                                onClick={() => handleSocialisationChange(true)}>
+                                Yes
+                            </button>
+                            <button type="button"
+                                className={`btn social-button ${selectedSocialisation === false ? 'btn-secondary' : ''}`}
+                                onClick={() => handleSocialisationChange(false)}
+                            >
+                                No
+                            </button>
+                        </div>
                     </div>
 
-                    {/* will need to add in database/api for productivity - ignore for now! */}
                     <div className="form-group">
-                    <label>Did you feel productive today?</label>
-                    <div className="socialisation-buttons">
-                        <button type="button" className="btn productivity-button">
-                            Not at all.
-                        </button>
-                        <button type="button" className="btn productivity-button">
-                            I tried..
-                        </button>
-                        <button type="button" className="btn productivity-button">
-                            Super Productive!
-                        </button>
-                        <button type="button" className="btn productivity-button">
-                            Somewhat
-                        </button>
-                    </div>
+                        <label>Rate your productivity today (1-5):</label>
+                        <div className="productivity-buttons">
+                            {[1, 2, 3, 4, 5].map(value => (
+                                <button
+                                    key={value}
+                                    type="button"
+                                    className={`btn productivity-button ${selectedProductivity === value ? 'btn-secondary' : ''}`}
+                                    onClick={() => handleProductivityChange(value)}
+                                >
+                                    {value}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                     <div className="form-group">
