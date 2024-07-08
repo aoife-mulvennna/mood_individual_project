@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 import { variables } from '../Variables.js';
 import { jwtDecode } from 'jwt-decode'; // Adjust the import path according to your project structure
-
+import QuickTrack from './QuickTrack';
+import Flame from '../Photos/Flame.png';
+import Star from '../Photos/Star.png';
 const Dashboard = () => {
     const [streak, setStreak] = useState(0);
     const [userName, setUserName] = useState('');
@@ -12,14 +14,13 @@ const Dashboard = () => {
         if (token) {
             const decodedToken = jwtDecode(token);
             console.log('Decoded token:', decodedToken);
-            fetchUserDetails(decodedToken.id, decodedToken.role);
+            fetchUserDetails(decodedToken.id);
         }
         fetchStreak();
     }, []);
 
-    const fetchUserDetails = (userId, userRole) => {
-        const endpoint = userRole === 'student' ? 'student-details' : 'staff-details';
-        fetch(`${variables.API_URL}${endpoint}/${userId}`, {
+    const fetchUserDetails = (userId) => {
+        fetch(`${variables.API_URL}student-details/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${sessionStorage.getItem('token')}`
             }
@@ -34,11 +35,7 @@ const Dashboard = () => {
             })
             .then(data => {
                 console.log('User details fetched:', data);
-                if (userRole === 'student') {
-                    setUserName(data.student_name);
-                } else if (userRole === 'staff') {
-                    setUserName(data.staff_name);
-                }
+                setUserName(data.student_name);
             })
             .catch(error => {
                 console.error('Error fetching user details:', error);
@@ -75,19 +72,29 @@ const Dashboard = () => {
 
     return (
         <div className="dashboard">
-            <h1>Welcome to Your Dashboard, {userName}</h1>
+            <h3>Welcome to Your Dashboard, {userName}</h3>
             <div className="card-container">
-                <div className="card">
-                    <h3>Stats</h3>
-                    <p>Your stats here...</p>
+                <div className="column">
+                    <div className="card">
+                        <h5>Quick Track</h5>
+                    <QuickTrack />
+                    </div>
+                    <div className="card">
+                        <h5>Stats <img src={Star} className="icon" alt='Star'/></h5>
+                        <p>Your stats here...</p>
+                    </div>
                 </div>
-                <div className="card">
-                    <h3>Recent Activity</h3>
-                    <p>Recent activity details...</p>
+                <div className="column">
+                    <div className="card">
+                        <h5>Recent Activity</h5>
+                        <p>Recent activity details...</p>
+                    </div>
                 </div>
-                <div className="card">
-                    <h3>Streak</h3>
-                    <p>Your current streak: {streak} days</p>
+                <div className="column">
+                    <div className="card">
+                        <h5>Streak <img src={Flame} className="icon" alt='Flame'/></h5>
+                        <p>Your current streak: {streak} days</p>
+                    </div>
                 </div>
             </div>
         </div>

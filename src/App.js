@@ -26,7 +26,7 @@ function App() {
 const Main = () => {
   const { token, user } = useAuth(); // Ensure useAuth is correctly imported
 const location = useLocation();
-const showTopBar = location.pathname !== '/login' && location.pathname !=='/create-account' && location.pathname !=='/';
+const showTopBar = location.pathname !== '/login' && location.pathname !=='/create-account' && location.pathname !=='/' && location.pathname !=='/logout';
 
   return (
     <div className="App">
@@ -76,6 +76,7 @@ const showTopBar = location.pathname !== '/login' && location.pathname !=='/crea
         </div>
       )}
       <div className="content">
+        
         <Routes>
           <Route exact path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />

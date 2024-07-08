@@ -23,9 +23,11 @@ const DailyTrack = () => {
             try {
                 const decoded = jwtDecode(storedToken);
                 console.log('Decoded token:', decoded);
-                setStudentName(decoded.studentName);
-                setStudentId(decoded.studentId);
-                setToken(storedToken); // Set token in state
+                setStudentId(decoded.id); // Ensure the id field is used consistently
+                setToken(storedToken);
+                fetchStudentName(decoded.id);
+                checkTrackedStatus(storedToken);
+                refreshList();
             }
             catch (error) {
                 console.error('Error decoding token:', error);
@@ -34,14 +36,8 @@ const DailyTrack = () => {
 
     }, []);
 
-    useEffect(() => {
-        if (studentId) {
-            fetchStudentName(studentId);
-        }
-    }, [studentId]);
-
     const fetchStudentName = (id) => {
-        fetch(variables.API_URL + `students/${id}`, {
+        fetch(variables.API_URL + `student-details/${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -53,17 +49,16 @@ const DailyTrack = () => {
             return response.json();
         })
         .then(data => {
-            setStudentName(data.name);
+            setStudentName(data.student_name);
         })
         .catch(error => {
             console.error('Error fetching student name:', error);
         });
     };
 
-    const checkTrackedStatus = useCallback(() => {
-        if (!token) return;
-
-        fetch(variables.API_URL + 'mood', {
+    const checkTrackedStatus = () => {
+      
+        fetch(variables.API_URL + 'mood/status', {
             headers: {
                 'Authorization': `Bearer ${token}`,
             }
@@ -76,21 +71,14 @@ const DailyTrack = () => {
             })
             .then(data => {
                 console.log('Check Tracked Status:', data);
-                if (data.status === 409 && data.message === 'Already tracked today') {
+                if (data.alreadyTracked) {
                     setAlreadyTracked(true); // Set state to true to handle UI accordingly
                 }
             })
             .catch(error => {
                 console.error('Error checking tracked status:', error);
             });
-    }, [token]);
-
-    useEffect(() => {
-        if (token) {
-            checkTrackedStatus();
-        }
-        refreshList();
-    }, [token, checkTrackedStatus]);
+    };
 
     const refreshList = () => {
         fetch(variables.API_URL + 'mood')

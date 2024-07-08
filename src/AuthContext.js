@@ -19,13 +19,11 @@ export const AuthProvider = ({ children }) => {
   const login = (newToken) => {
     setToken(newToken);
     localStorage.setItem('token', newToken);
-    // Since we are not using useHistory here, we don't need it
   };
 
   const logout = () => {
     setToken(null);
     localStorage.removeItem('token');
-    // Since we are not using useHistory here, we don't need it
   };
 
   return (
