@@ -18,7 +18,7 @@ const emojiMap = {
 
 const QuickTrack = () => {
     const [moods, setMoods] = useState([]);
-    const [selectedMood, setSelectedMood] = useState('');
+    const [selectedMoodId, setSelectedMoodId] = useState('');
     const [token, setToken] = useState('');
 
     useEffect(() => {
@@ -56,7 +56,7 @@ const QuickTrack = () => {
     };
 
     const handleMoodSelection = (mood) => {
-        setSelectedMood(mood.mood_name);
+        setSelectedMoodId(mood.mood_id);
     };
 
     const handleSubmit = () => {
@@ -64,7 +64,7 @@ const QuickTrack = () => {
             alert('No token found, please log in again.');
             return;
         }
-        fetch(`${variables.API_URL}mood`, {
+        fetch(`${variables.API_URL}quick-track`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -72,7 +72,7 @@ const QuickTrack = () => {
                 'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
-                mood_name: selectedMood
+                mood_id: selectedMoodId
                 // Add other fields as needed (exercise_duration, sleep_duration, etc.)
             })
         })
@@ -83,7 +83,6 @@ const QuickTrack = () => {
                 }
                 const data = await res.json();
                 alert(data.message);
-                refreshMoods();
             })
             .catch(error => {
                 alert('Failed: ' + error.message);
@@ -104,7 +103,7 @@ const QuickTrack = () => {
                                 key={mood.mood_id}
                                 src={emojiMap[mood.mood_score]}// Adjust path as per your folder structure
                                 alt={mood.mood_name}
-                                className={`mood-image ${selectedMood === mood.mood_name ? 'selected' : ''}`}
+                                className={`mood-image ${selectedMoodId === mood.mood_id? 'selected' : ''}`}
                                 onClick={() => handleMoodSelection(mood)}
                             />
                         ))
