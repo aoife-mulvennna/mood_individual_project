@@ -5,6 +5,8 @@ import "./DailyTrack.css";
 
 const DailyTrack = () => {
     const [moods, setMoods] = useState([]);
+    const [socialisations, setSocialisations] = useState([]);
+
     const [selectedMood, setSelectedMood] = useState('');
     const [selectedExerciseDuration, setSelectedExerciseDuration] = useState(0);
     const [selectedSleepDuration, setSelectedSleepDuration] = useState(0);
@@ -15,6 +17,7 @@ const DailyTrack = () => {
     const [token, setToken] = useState('');
     const [alreadyTracked, setAlreadyTracked] = useState(false);
 
+
     useEffect(() => {
         const storedToken = sessionStorage.getItem('token');
         console.log('Token retrieved from session storage:', storedToken);
@@ -23,83 +26,103 @@ const DailyTrack = () => {
             try {
                 const decoded = jwtDecode(storedToken);
                 console.log('Decoded token:', decoded);
+                
                 setStudentId(decoded.id); // Ensure the id field is used consistently
                 setToken(storedToken);
-                fetchStudentName(decoded.id);
-                checkTrackedStatus(storedToken);
-                refreshList();
+                fetchStudentData(decoded.id, storedToken);
             }
             catch (error) {
                 console.error('Error decoding token:', error);
             }
         }
-
     }, []);
 
-    const fetchStudentName = (id) => {
+    const fetchStudentData = async (id, token) => {
+        await fetchStudentName(id, token);
+        await checkTrackedStatus(token);
+        refreshMoods(token);
+    };
+
+    const fetchStudentName = (id, token) => {
         fetch(variables.API_URL + `student-details/${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         })
-        .then(response => {
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                setStudentName(data.student_name);
+            })
+            .catch(error => {
+                console.error('Error fetching student name:', error);
+            });
+    };
+
+    const checkTrackedStatus = async (token) => {
+        try {
+            const response = await fetch(variables.API_URL + 'mood/status', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
-            return response.json();
-        })
-        .then(data => {
-            setStudentName(data.student_name);
-        })
-        .catch(error => {
-            console.error('Error fetching student name:', error);
-        });
+            const data = await response.json();
+            console.log('Check Tracked Status:', data);
+            setAlreadyTracked(data.alreadyTracked); // Set state to true to handle UI accordingly
+        }
+        catch (error) {
+            console.error('Error checking tracked status:', error);
+        }
     };
 
-    const checkTrackedStatus = () => {
-      
-        fetch(variables.API_URL + 'mood/status', {
-            headers: {
-                'Authorization': `Bearer ${token}`,
+    const refreshMoods = async () => {
+        try {
+            const response = await fetch(variables.API_URL + 'mood', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
             }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Check Tracked Status:', data);
-                if (data.alreadyTracked) {
-                    setAlreadyTracked(true); // Set state to true to handle UI accordingly
-                }
-            })
-            .catch(error => {
-                console.error('Error checking tracked status:', error);
-            });
+            const data = await response.json();
+            const sortedMoods = data.sort((a, b) => a.mood_score - b.mood_score);
+            setMoods(sortedMoods);
+        } catch (error) {
+            console.error('Error fetching moods:', error);
+        }
     };
 
-    const refreshList = () => {
-        fetch(variables.API_URL + 'mood')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
+    useEffect(() => {
+        fetchSocialisations();
+    }, []);
+
+    const fetchSocialisations = async () => {
+        try {
+            const response = await fetch(variables.API_URL + 'socialisations', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Fetched moods:', data);
-                const sortedMoods = data.sort((a, b) => a.mood_score - b.mood_score);
-                setMoods(sortedMoods);
-            })
-            .catch(error => {
-                console.error('There was an error!', error);
             });
-    }
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            const data = await response.json();
+            setSocialisations(data);
+        } catch (error) {
+            console.error('Error fetching socialisations:', error);
+        }
+    };
 
     const handleMoodSelection = (mood) => {
-        setSelectedMood(mood.mood_name);
+        setSelectedMood(mood.mood_id);
     }
     const handleExerciseDurationChange = (event) => {
         setSelectedExerciseDuration(event.target.value);
@@ -109,50 +132,68 @@ const DailyTrack = () => {
         setSelectedSleepDuration(event.target.value);
     };
 
-    const handleSocialisationChange = (value) => {
-        setSelectedSocialisation(value);
+    const handleSocialisationSelection = (socialisation) => {
+        setSelectedSocialisation(socialisation.socialisation_id);
     };
 
     const handleProductivityChange = (value) => {
         setSelectedProductivity(value);
     };
 
-    const handleSubmit = () => {
-        if (!token) {
-            alert('No token found, please log in again.');
-            return;
-        }
-        fetch(variables.API_URL + 'mood', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
+    const handleSubmit = async () => {
+        try {
+            if (!token) {
+                alert('No token found, please log in again.');
+                return;
+            }
+
+            console.log('Submitting with token:', token);
+            console.log('Form data:', {
                 student_id: studentId,
-                mood_name: selectedMood,
+                mood_id: selectedMood,
                 exercise_duration: selectedExerciseDuration,
                 sleep_duration: selectedSleepDuration,
-                socialisation: selectedSocialisation,
-                productivity: selectedProductivity
-            })
-        })
-
-            .then(async res => {
-                if (!res.ok) {
-                    const errorText = await res.text();
-                    throw new Error(errorText);
-                }
-                const data = await res.json();
-                alert(data.message);
-                refreshList();
-            })
-            .catch((error) => {
-                alert('Failed: ' + error.message);
-                console.error('Error:', error.message);
+                socialisation_id: selectedSocialisation,
+                productivity_score: selectedProductivity
             });
+
+            const response = await fetch(`http://localhost:8000/api/daily-track`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    student_id: studentId,
+                    mood_id: selectedMood,
+                    exercise_duration: selectedExerciseDuration,
+                    sleep_duration: selectedSleepDuration,
+                    socialisation_id: selectedSocialisation,
+                    productivity_score: selectedProductivity
+                })
+            })
+
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Failed:', errorText);
+                throw new Error('Failed: ' + errorText);
+            }
+
+            const data = await response.json();
+            console.log('Response data:', data);
+            alert(data.message);
+            refreshMoods(token);
+        } catch (error) {
+            alert('Failed: ' + error.message);
+            console.error('Error:', error);
+        }
     };
+
+
     if (alreadyTracked) {
         return (
             <div>
@@ -179,7 +220,7 @@ const DailyTrack = () => {
                                     <button
                                         key={mood.mood_id}
                                         type="button"
-                                        className={`btn mood-button ${selectedMood === mood.mood_name ? 'btn-secondary' : ''}`}
+                                        className={`btn mood-button ${selectedMood === mood.mood_id ? 'btn-secondary' : ''}`}
                                         onClick={() => handleMoodSelection(mood)}
                                     >
                                         {mood.mood_name}
@@ -209,19 +250,24 @@ const DailyTrack = () => {
                     </div>
 
                     <div className="form-group">
-                        <label>Did you complete a non-physical social activity today?</label>
+                        <label>How many minutes of a non-physical social activity did you complete today?</label>
                         <div className="socialisation-buttons">
-                            <button type="button"
-                                className={`btn social-button ${selectedSocialisation === true ? 'btn-secondary' : ''}`}
-                                onClick={() => handleSocialisationChange(true)}>
-                                Yes
-                            </button>
-                            <button type="button"
-                                className={`btn social-button ${selectedSocialisation === false ? 'btn-secondary' : ''}`}
-                                onClick={() => handleSocialisationChange(false)}
-                            >
-                                No
-                            </button>
+                            {socialisations.length === 0 ? (
+                                <p>Loading socialisations...</p>
+                            ) : (
+                                socialisations.map(socialisation => (
+                                    <button
+                                        key={socialisation.socialisation_id}
+                                        type="button"
+                                        className={`btn mood-button ${selectedSocialisation === socialisation.socialisation_id ? 'btn-secondary' : ''}`}
+                                        onClick={() => handleSocialisationSelection(socialisation)}
+                                    >
+                                        {socialisation.socialisation_name}
+                                    </button>
+                                ))
+                            )}
+
+
                         </div>
                     </div>
 
