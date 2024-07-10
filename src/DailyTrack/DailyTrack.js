@@ -2,6 +2,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { variables } from '../Variables.js';
 import { jwtDecode } from 'jwt-decode';
 import "./DailyTrack.css";
+import Emoji1 from '../Photos/Emoji-1.png';
+import Emoji2 from '../Photos/Emoji-2.png';
+import Emoji3 from '../Photos/Emoji-3.png';
+import Emoji4 from '../Photos/Emoji-4.png';
+import Emoji5 from '../Photos/Emoji-5.png';
 
 const DailyTrack = () => {
     const [moods, setMoods] = useState([]);
@@ -26,7 +31,7 @@ const DailyTrack = () => {
             try {
                 const decoded = jwtDecode(storedToken);
                 console.log('Decoded token:', decoded);
-                
+
                 setStudentId(decoded.id); // Ensure the id field is used consistently
                 setToken(storedToken);
                 fetchStudentData(decoded.id, storedToken);
@@ -41,6 +46,7 @@ const DailyTrack = () => {
         await fetchStudentName(id, token);
         await checkTrackedStatus(token);
         refreshMoods(token);
+        fetchSocialisations(token);
     };
 
     const fetchStudentName = (id, token) => {
@@ -75,7 +81,11 @@ const DailyTrack = () => {
             }
             const data = await response.json();
             console.log('Check Tracked Status:', data);
-            setAlreadyTracked(data.alreadyTracked); // Set state to true to handle UI accordingly
+            if (data && data.alreadyTracked !== undefined) {
+                setAlreadyTracked(data.alreadyTracked);
+            } else {
+                console.error('Unexpected data structure:', data);
+            }
         }
         catch (error) {
             console.error('Error checking tracked status:', error);
@@ -196,23 +206,24 @@ const DailyTrack = () => {
 
     if (alreadyTracked) {
         return (
-            <div>
-                <h3>This is the Daily Tracker page</h3>
-                <h3>Hi {studentName}</h3>
-                <p>Sorry, you have already tracked today!</p>
+            <div className="max-w-7xl mx-auto mt-12 p-6 bg-white rounded-lg shadow-lg text-center">
+                <h3 className="text-3xl font-semibold mb-4">Daily Tracker</h3>
+                <h3 className="text-xl mb-2">Hi {studentName}</h3>
+                <p className="text-gray-700 mb-2">Sorry, you have already tracked today, come back tomorrow!</p>
+                <p className="text-gray-700">For now, use the quick track feature on the dashboard!</p>
             </div>
         );
 
     } else {
 
         return (
-            <div className="container">
-                <h3>This is the Daily Tracker page</h3>
-                <h3>Hi {studentName}</h3>
+            <div className="max-w-7xl mx-auto mt-12 p-6 bg-white rounded-lg shadow-lg">
+                <h3 className="text-3xl font-semibold mb-6 text-center">Daily Tracker</h3>
+                <h3 className="text-xl mb-4 text-center justify-center">Hi {studentName}</h3>
                 <form>
-                    <div className="form-group">
-                        <label>How did you feel overall today?</label>
-                        <div className="mood-buttons">
+                    <div className="form-group mb-6">
+                        <label className="block text-gray-700 text-lg mb-2">How did you feel overall today?</label>
+                        <div className="flex flex-wrap gap-2 justify-center">
                             {moods.length === 0 ? (
                                 <p>Loading moods...</p>
                             ) : (
@@ -220,38 +231,41 @@ const DailyTrack = () => {
                                     <button
                                         key={mood.mood_id}
                                         type="button"
-                                        className={`btn mood-button ${selectedMood === mood.mood_id ? 'btn-secondary' : ''}`}
+                                        className={`btn mood-button px-3 py-2 rounded transition ${selectedMood === mood.mood_id ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                                         onClick={() => handleMoodSelection(mood)}
                                     >
-                                        {mood.mood_name}
+                                        {mood.mood_name} 
                                     </button>
                                 ))
                             )}
                         </div>
                     </div>
-                    <div className="form-group">
-                        <label>How many minutes of exercise did you complete today?</label>
+                    <div className="form-group mb-6">
+                        <label className="block text-gray-700 text-lg mb-2">How many minutes of exercise did you complete today?</label>
                         <input
                             type="number"
                             name="exercise_duration"
                             value={selectedExerciseDuration}
                             onChange={handleExerciseDurationChange}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label>How many hours of sleep did you get last night?</label>
+                    <div className="form-group mb-6">
+                        <label className="block text-gray-700 mb-2 text-lg" >How many hours of sleep did you get last night?</label>
                         <input
                             type="number"
                             name="sleep_duration"
                             value={selectedSleepDuration}
                             onChange={handleSleepDurationChange}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                         />
+
                     </div>
 
-                    <div className="form-group">
-                        <label>How many minutes of a non-physical social activity did you complete today?</label>
-                        <div className="socialisation-buttons">
+                    <div className="form-group  mb-6">
+                        <label className="block text-gray-700 text-lg mb-2">How many minutes of a non-physical social activity did you complete today?</label>
+                        <div className="flex flex-wrap gap-2 justify-center">
                             {socialisations.length === 0 ? (
                                 <p>Loading socialisations...</p>
                             ) : (
@@ -259,7 +273,7 @@ const DailyTrack = () => {
                                     <button
                                         key={socialisation.socialisation_id}
                                         type="button"
-                                        className={`btn mood-button ${selectedSocialisation === socialisation.socialisation_id ? 'btn-secondary' : ''}`}
+                                        className={`btn mood-button px-3 py-2 rounded-lg transition ${selectedSocialisation === socialisation.socialisation_id ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                                         onClick={() => handleSocialisationSelection(socialisation)}
                                     >
                                         {socialisation.socialisation_name}
@@ -271,14 +285,14 @@ const DailyTrack = () => {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label>Rate your productivity today (1-5):</label>
-                        <div className="productivity-buttons">
+                    <div className="form-group mb-6">
+                        <label className="block text-gray-700 text-lg mb-2">Rate your productivity today (1-5):</label>
+                        <div className=" flex gap-2 justify-center">
                             {[1, 2, 3, 4, 5].map(value => (
                                 <button
                                     key={value}
                                     type="button"
-                                    className={`btn productivity-button ${selectedProductivity === value ? 'btn-secondary' : ''}`}
+                                    className={`btn productivity-button px-3 py-2 rounded-lg transition ${selectedProductivity === value ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                                     onClick={() => handleProductivityChange(value)}
                                 >
                                     {value}
@@ -287,8 +301,8 @@ const DailyTrack = () => {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <button type="button" className="btn submit-button" onClick={handleSubmit}>
+                    <div className="form-group text-center">
+                        <button type="button" className="btn submit-button bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600" onClick={handleSubmit}>
                             Submit
                         </button>
                     </div>

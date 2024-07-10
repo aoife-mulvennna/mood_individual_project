@@ -16,7 +16,6 @@ const emojiMap = {
     5: Emoji5
 };
 
-
 const QuickTrack = () => {
     const [moods, setMoods] = useState([]);
     const [selectedMoodId, setSelectedMoodId] = useState('');
@@ -25,10 +24,13 @@ const QuickTrack = () => {
 
     useEffect(() => {
         const storedToken = sessionStorage.getItem('token');
-
         const storedCooldown = parseInt(localStorage.getItem('cooldownRemainingSeconds'), 10);
+        const lastUpdatedTime = parseInt(localStorage.getItem('lastUpdatedTime'), 10);
+
         if (!isNaN(storedCooldown) && storedCooldown > 0) {
-            setCooldownRemainingSeconds(storedCooldown);
+            const currentTime = Math.floor(Date.now() / 1000);
+            const newCooldownRemainingSeconds = Math.max(storedCooldown - (currentTime - lastUpdatedTime), 0);
+            setCooldownRemainingSeconds(newCooldownRemainingSeconds);
         }
 
         if (storedToken) {
@@ -42,12 +44,27 @@ const QuickTrack = () => {
     }, []);
 
     useEffect(() => {
-        // Save cooldownRemainingSeconds to localStorage whenever it changes
-        localStorage.setItem('cooldownRemainingSeconds', cooldownRemainingSeconds);
+        if (cooldownRemainingSeconds > 0) {
+            const interval = setInterval(() => {
+                setCooldownRemainingSeconds(prevSeconds => {
+                    const newSeconds = prevSeconds - 1;
+                    localStorage.setItem('cooldownRemainingSeconds', newSeconds);
+                    localStorage.setItem('lastUpdatedTime', Math.floor(Date.now() / 1000));
+                    if (newSeconds <= 0) {
+                        clearInterval(interval);
+                    }
+                    return newSeconds;
+                });
+            }, 1000);
 
-        // Clear localStorage on successful submission
+            return () => clearInterval(interval);
+        }
+    }, [cooldownRemainingSeconds]);
+
+    useEffect(() => {
         if (cooldownRemainingSeconds === 0) {
             localStorage.removeItem('cooldownRemainingSeconds');
+            localStorage.removeItem('lastUpdatedTime');
         }
     }, [cooldownRemainingSeconds]);
 
@@ -92,6 +109,8 @@ const QuickTrack = () => {
                 if (res.status === 409) {
                     const { remainingTimeSeconds } = await res.json();
                     setCooldownRemainingSeconds(remainingTimeSeconds);
+                    localStorage.setItem('cooldownRemainingSeconds', remainingTimeSeconds);
+                    localStorage.setItem('lastUpdatedTime', Math.floor(Date.now() / 1000));
                     return;
                 }
                 if (!res.ok) {
@@ -129,8 +148,8 @@ const QuickTrack = () => {
     return (
         <div className="quick-track">
             <div className="form-group">
-                <p>How do you feel now?</p>
-                <div className="mood-buttons">
+                <p className="text-center mb-4">How do you feel now?</p>
+                <div className="flex justify-center gap-2 mb-4">
                     {moods.length === 0 ? (
                         <p>Loading moods...</p>
                     ) : (
@@ -139,18 +158,18 @@ const QuickTrack = () => {
                                 key={mood.mood_id}
                                 src={emojiMap[mood.mood_score]}// Adjust path as per your folder structure
                                 alt={mood.mood_name}
-                                className={`mood-image ${selectedMoodId === mood.mood_id ? 'selected' : ''}`}
+                                className={`w-12 h-12 cursor-pointer transform transition-transform duration-200 ${selectedMoodId === mood.mood_id ? 'scale-125 border-2 border-red-500 rounded-full' : ''}`}
                                 onClick={() => handleMoodSelection(mood)}
                             />
                         ))
                     )}
                 </div>
-                {cooldownRemainingSeconds > 1 ? (
+                {cooldownRemainingSeconds > 0 ? (
                     <div>
-                        <p>You can submit another entry in {formatTime(cooldownRemainingSeconds)}</p>
+                        <p className="text-center">You can submit another entry in {formatTime(cooldownRemainingSeconds)}</p>
                     </div>
                 ) : (
-                    <button className="btn tick-button" onClick={handleSubmit}>
+                    <button className="flex justify-center items-center tick-button mx-auto mt-4 text-white px-4 py-2 rounded hover:scale-110 transition-transform " onClick={handleSubmit}>
                         <img src={Tick} className="tick" alt="Submit" />
                     </button>
                 )}

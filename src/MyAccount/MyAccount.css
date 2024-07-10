@@ -1,39 +1,11 @@
 /* MyAccount.css */
 
-.my-account {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .my-account h1 {
-    font-size: 2rem;
-    margin-bottom: 20px;
-  }
-  
-  .account-info {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 8px;
-    margin-top: 20px;
-  }
-  
-  .buttons {
-    margin-top: 20px;
-  }
-  .reset-password-button {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-  
-  .reset-password-button:hover {
-    background-color: #2980b9;
-  }
+/* Custom styles, if any, that are not covered by Tailwind classes */
+body, h1, h2, h3, p, ul {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+}

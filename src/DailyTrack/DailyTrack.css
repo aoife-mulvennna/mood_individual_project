@@ -1,84 +1,38 @@
-/* Reset some default styles */
+/* DailyTrack.css */
+
+/* Custom styles, if any, that are not covered by Tailwind classes */
 body, h1, h2, h3, p, ul {
     margin: 0;
     padding: 0;
 }
 
-/* Basic styling for the page */
 body {
     font-family: Arial, sans-serif;
-    
 }
 
 .container {
-    max-width: 70%; /* Adjust as needed */
-    margin:10px auto; /* Center horizontally with auto margins */
+    max-width: 70%;
+    margin: 10px auto;
     padding: 20px;
-    background-color: #fff; /* White background for container */
+    background-color: #fff;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Soft shadow effect */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.mood-buttons, .socialisation-buttons, .productivity-buttons {
+    margin-top: 10px;
+}
 
-h3 {
-    color: #333; /* Dark grey for headings */
+.mood-buttons button, .socialisation-buttons button, .productivity-buttons button {
+    margin-right: 10px;
     margin-bottom: 10px;
 }
 
-.form-group {
-    margin-bottom: 20px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    color: #555; /* Dark grey for labels */
-}
-
-input[type="number"] {
-    width: 100%;
-    padding: 8px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.btn {
-    display: inline-block;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-    text-decoration: none;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-.btn-secondary {
-    background-color: #e0220d; /* Red for selected buttons */
-    color: white;
-}
-
-.btn-secondary:hover {
-    background-color: #b71709; /* Darker red on hover */
-}
-
-/* Mood buttons */
-.mood-buttons {
-    margin-top: 10px;
-}
-
-/* Social buttons */
-.socialisation-buttons {
-    margin-top: 10px;
-}
-
-/* Submit button */
 .submit-button {
-    background-color: #e0220d; /* Blue submit button */
+    background-color: #e0220d;
     color: white;
 }
 
 .submit-button:hover {
-    background-color: #b71709; /* Darker blue on hover */
+    background-color: #b71709;
 }

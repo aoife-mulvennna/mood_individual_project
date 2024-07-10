@@ -1,43 +1,17 @@
-.App {
-  font-family: Arial, sans-serif;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 
 .top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: rgb(80, 80, 80);
-  height: 80px; /* Set a fixed height for the top bar */
-  padding:20px; /* Horizontal padding */
-}
 
-.logo-container {
-  display: flex;
-  align-items: center;
+  padding:20px; /* Horizontal padding */
 }
 
 .logo {
   width:150px; /* Adjust size as needed */
   height: auto; /* Maintain aspect ratio */
   margin-right: 10px;
-  margin-top:20px;
-}
-.app-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #fffefe; /* Make sure the text is visible */
-  margin-left: 10px;
-}
-
-
-.nav-container {
-  display: flex;
-  align-items: center; /* Center the nav links vertically */
-}
-
-.navbar {
-  display: flex;
-  gap: 10px; /* Gap between links */
 }
 
 .nav-link {
@@ -51,11 +25,6 @@
   color: rgb(80, 80, 80);
   background-color: #ddd;
   border-radius: 4px;
-}
-
-.content {
-  flex: 1;
-  padding: 20px;
 }
 
 .grey-button {

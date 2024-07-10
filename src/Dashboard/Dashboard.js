@@ -15,8 +15,8 @@ const Dashboard = () => {
             const decodedToken = jwtDecode(token);
             console.log('Decoded token:', decodedToken);
             fetchUserDetails(decodedToken.id);
+            fetchStreak(decodedToken.id);
         }
-        fetchStreak();
     }, []);
 
     const fetchUserDetails = (userId) => {
@@ -44,14 +44,9 @@ const Dashboard = () => {
 
 
     const fetchStreak = () => {
-        const token = sessionStorage.getItem('token');
-        if (!token) {
-            console.error('No token found');
-            return;
-        }
-        fetch(`${variables.API_URL}streak`, {
+        fetch(`http://localhost:8000/api/streak`, {
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${sessionStorage.getItem('token')}`
             }
         })
             .then(response => {
@@ -63,6 +58,7 @@ const Dashboard = () => {
                 return response.json();
             })
             .then(data => {
+                console.log('Streak fetched:', data)
                 setStreak(data.streak);
             })
             .catch(error => {
@@ -71,29 +67,33 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="dashboard">
-            <h3>Welcome to Your Dashboard, {userName}</h3>
-            <div className="card-container">
-                <div className="column">
-                    <div className="card">
-                        <h5>Quick Track</h5>
+        <div className="max-w-7xl mx-auto mt-12 p-6 bg-white rounded-lg shadow-lg">
+            <h3 className="text-center text-2xl font-semibold mb-6 text-gray-800">Welcome to Your Dashboard, {userName}</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="flex flex-col gap-6">
+                    <div className="p-6 bg-gray-100 rounded-lg shadow">
+                        <h5 className="text-lg font-semibold mb-4 flex items-center">Quick Track</h5>
                     <QuickTrack />
                     </div>
-                    <div className="card">
-                        <h5>Stats <img src={Star} className="icon" alt='Star'/></h5>
+                    <div className="p-6 bg-gray-100 rounded-lg shadow">
+                        <h5 className="text-lg font-semibold mb-4 flex items-center">Stats <img src={Star} className="w-6 h-6 ml-2" alt='Star'/></h5>
                         <p>Your stats here...</p>
                     </div>
                 </div>
-                <div className="column">
-                    <div className="card">
-                        <h5>Recent Activity</h5>
+                <div className="flex flex-col gap-6">
+                    <div className="p-6 bg-gray-100 rounded-lg shadow">
+                        <h5 className="text-lg font-semibold mb-4 flex items-center">Recent Activity</h5>
                         <p>Recent activity details...</p>
                     </div>
                 </div>
-                <div className="column">
-                    <div className="card">
-                        <h5>Streak <img src={Flame} className="icon" alt='Flame'/></h5>
-                        <p>Your current streak: {streak} days</p>
+                <div className="flex flex-col gap-6">
+                    <div className="p-6 bg-gray-100 rounded-lg shadow">
+                        <h5  className="text-lg font-semibold mb-4 flex items-center">Streak <img src={Flame} className="w-6 h-6 ml-2" alt='Flame'/></h5>
+                        {streak > 0 ? (
+                            <p>Your current streak: {streak} {streak === 1 ? 'day' : 'days'}</p>
+                        ) : (
+                            <p>You have no streak. Start recording in the daily tracker to build your streak!</p>
+                        )}
                     </div>
                 </div>
             </div>
