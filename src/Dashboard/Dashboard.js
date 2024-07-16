@@ -6,6 +6,7 @@ import QuickTrack from './QuickTrack';
 import Flame from '../Photos/Flame.png';
 import Star from '../Photos/Star.png';
 import StreakDisplay from './DisplayStreak';
+import MyAssignments from './MyAssignments';
 const Dashboard = () => {
     const [userName, setUserName] = useState('');
     const [studentId, setStudentId] = useState(null);
@@ -130,63 +131,7 @@ const Dashboard = () => {
                     </div>
                 </div>
                 <div className="flex flex-col gap-6">
-                    <div className="p-6 bg-gray-100 rounded-lg shadow relative">
-                        <h5 className="text-lg font-semibold mb-4 flex items-center">My Assignments</h5>
-                        <button onClick={handleAddAssignment} className="absolute top-4 right-4 text-gray-700 hover:text-gray-900 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg>
-                        </button>
-                        {showForm && (
-                            <div className="mt-4">
-                                <input
-                                    type="text"
-                                    name="name"
-                                    value={newAssignment.name}
-                                    onChange={handleInputChange}
-                                    placeholder="Assignment Name"
-                                    className="mb-2 p-2 border rounded w-full"
-                                />
-                                <input
-                                    type="date"
-                                    name="deadline"
-                                    value={newAssignment.deadline}
-                                    onChange={handleInputChange}
-                                    placeholder="Assignment Deadline"
-                                    className="mb-2 p-2 border rounded w-full"
-                                />
-                                <div className="flex justify-end">
-                                    <button
-                                        onClick={handleSaveAssignment}
-                                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-                                    >
-                                        Save Assignment
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                        {assignments.length === 0 ? (
-                            <p>No assignments found</p>
-                        ) : (
-                            <ul className="list-none pl-0">
-                                {assignments.map((assignment, index) => {
-                                    const { day, month } = formatDate(assignment.assignment_deadline);
-                                    return (
-                                        <li key={index} className="flex items-center mb-4">
-                                            <div className="flex-shrink-0 text-center">
-                                                <div className="text-3xl font-bold text-gray-800">{day}</div>
-                                                <div className="text-sm font-medium text-gray-600">{month}</div>
-                                            </div>
-                                            <div className="flex-grow mx-4 border-l-2 border-gray-300 h-12"></div>
-                                            <div>
-                                                <span className="text-lg text-gray-700">{assignment.assignment_name}</span>
-                                            </div>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        )}
-                    </div>
+                <MyAssignments studentId={studentId} />
                     <div className="p-6 bg-gray-100 rounded-lg shadow">
                         <h5 className="text-lg font-semibold mb-4 flex items-center">Recent Activity</h5>
                         <p>Recent activity details...</p>
