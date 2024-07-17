@@ -7,13 +7,11 @@ import Flame from '../Photos/Flame.png';
 import Star from '../Photos/Star.png';
 import StreakDisplay from './DisplayStreak';
 import MyAssignments from './MyAssignments';
+
 const Dashboard = () => {
     const [userName, setUserName] = useState('');
     const [studentId, setStudentId] = useState(null);
     const [assignments, setAssignments] = useState([]);
-    const [showForm, setShowForm] = useState(false);
-    const [newAssignment, setNewAssignment] = useState({ name: '', deadline: '' });
-
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
@@ -69,53 +67,7 @@ const Dashboard = () => {
             });
     };
 
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const day = date.getDate();
-        const month = date.toLocaleString('default', { month: 'short' }).toUpperCase();
-        return { day, month };
-    };
 
-    const handleAddAssignment = () => {
-        setShowForm(!showForm);
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setNewAssignment(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
-
-    const handleSaveAssignment = async () => {
-        try {
-            const response = await fetch(`${variables.API_URL}assignments`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-                },
-                body: JSON.stringify({
-                    student_id: studentId,
-                    assignment_name: newAssignment.name,
-                    assignment_deadline: newAssignment.deadline
-                })
-            });
-
-            if (!response.ok) {
-                const text = await response.text();
-                throw new Error(text);
-            }
-
-            const data = await response.json();
-            setAssignments(prevAssignments => [...prevAssignments, data.assignment]);
-            setNewAssignment({ name: '', deadline: '' });
-            setShowForm(false);
-        } catch (error) {
-            console.error('Error adding assignment:', error);
-        }
-    };
     return (
         <div className="max-w-7xl mx-auto mt-12 p-6 bg-white rounded-lg shadow-lg">
             <h3 className="text-center text-2xl font-semibold mb-6 text-gray-800">Welcome to Your Dashboard, {userName}</h3>
@@ -131,7 +83,7 @@ const Dashboard = () => {
                     </div>
                 </div>
                 <div className="flex flex-col gap-6">
-                <MyAssignments studentId={studentId} />
+                    <MyAssignments studentId={studentId} />
                     <div className="p-6 bg-gray-100 rounded-lg shadow">
                         <h5 className="text-lg font-semibold mb-4 flex items-center">Recent Activity</h5>
                         <p>Recent activity details...</p>

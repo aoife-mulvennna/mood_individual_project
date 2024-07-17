@@ -16,6 +16,8 @@ const emojiMap = {
     5: Emoji5
 };
 
+const cooldownPeriodSeconds = 3600;
+
 const QuickTrack = () => {
     const [moods, setMoods] = useState([]);
     const [selectedMoodId, setSelectedMoodId] = useState('');
@@ -119,7 +121,9 @@ const QuickTrack = () => {
                 }
                 const data = await res.json();
                 alert(data.message);
+                setCooldownRemainingSeconds(cooldownPeriodSeconds);
                 refreshMoods();
+                
             })
             .catch(error => {
                 alert('Failed: ' + error.message);
@@ -133,17 +137,17 @@ const QuickTrack = () => {
         return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
     };
 
-    useEffect(() => {
-        let interval;
+    // useEffect(() => {
+    //     let interval;
 
-        if (cooldownRemainingSeconds > 0) {
-            interval = setInterval(() => {
-                setCooldownRemainingSeconds(prevSeconds => prevSeconds - 1);
-            }, 1000);
-        }
+    //     if (cooldownRemainingSeconds > 0) {
+    //         interval = setInterval(() => {
+    //             setCooldownRemainingSeconds(prevSeconds => prevSeconds - 1);
+    //         }, 1000);
+    //     }
 
-        return () => clearInterval(interval);
-    }, [cooldownRemainingSeconds]);
+    //     return () => clearInterval(interval);
+    // }, [cooldownRemainingSeconds]);
 
     return (
         <div className="quick-track">
