@@ -16,59 +16,38 @@ import { variables } from '../Variables';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale);
 
-const generateDateRange = (startDate, endDate) => {
-    const dateArray = [];
-    let currentDate = new Date(startDate);
-    while (currentDate <= new Date(endDate)) {
-        dateArray.push(new Date(currentDate));
-        currentDate.setDate(currentDate.getDate() + 1);
-    }
-    return dateArray;
-};
+const SocialisationChart = ({studentId})=>{
+    const [socialisationScores, setSocialisationScores] = useState([]);
 
-const MoodScoreChart = ({ studentId }) => {
-    const [moodScores, setMoodScores] = useState([]);
-    const [dateRange, setDateRange] = useState([]);
-
-    useEffect(() => {
-        if (studentId) {
-            fetchMoodScores(studentId);
+    useEffect(()=>{
+        if (studentId){
+            fetchSocialisationScores(studentId);
         }
-    }, [studentId]);
-
-    const fetchMoodScores = (userId) => {
-        fetch(`${variables.API_URL}mood-scores/${userId}`, {
+    },[studentId]);
+    const fetchSocialisationScores = (userId)=>{
+        fetch(`${variables.API_URL}socialisation/${userId}`, {
             headers: {
                 Authorization: `Bearer ${sessionStorage.getItem('token')}`,
             },
         })
             .then((response) => response.json())
-            .then((data) => {
-                setMoodScores(data.moodScores);
-
-                if (data.moodScores.length > 0) {
-                    const startDate = data.moodScores[0].daily_record_timestamp;
-                    const endDate = data.moodScores[data.moodScores.length - 1].daily_record_timestamp;
-                    setDateRange(generateDateRange(startDate, endDate));
-                }
-            })
+            .then((data) => setSocialisationScores(data.socialisationScores))
             .catch((error) => console.error('Error fetching mood scores:', error));
     };
 
-    const moodLabels = moodScores.reduce((acc, record) => {
-        acc[record.mood_score] = record.mood_name;
-        return acc;
-    }, {});
-
-    const dataPoints = moodScores.map(record => ({
+    const dataPoints = socialisationScores.map(record => ({
         x: new Date(record.daily_record_timestamp),
-        y: record.mood_score,
+        y: record.socialisation_score,
     }));
 
+    const socialisationLabels = socialisationScores.reduce((acc, record) => {
+        acc[record.socialisation_score] = record.socialisation_name;
+        return acc;
+    }, {});
     const chartData = {
         datasets: [
             {
-                label: 'Mood Score',
+                label: 'Socialisation Score',
                 data: dataPoints,
                 fill: false,
                 borderColor: 'rgb(75, 192, 192)',
@@ -85,7 +64,7 @@ const MoodScoreChart = ({ studentId }) => {
             },
             title: {
                 display: true,
-                text: 'Mood Scores Over Time',
+                text: 'Socialisation Score Over Time',
             },
         },
         scales: {
@@ -97,21 +76,21 @@ const MoodScoreChart = ({ studentId }) => {
                 },
             },
             y: {
+
                 type: 'linear',
                 beginAtZero: true,
                 min: 0,
-                max: 5,
+                max: 4,
                 ticks: {
                     stepSize: 1,
                     callback: function(value) {
-                        return moodLabels[value] || value;
+                        return socialisationLabels[value] || value;
                     }
                 }
             },
         },
     };
-
     return <Line data={chartData} options={options} />;
 };
 
-export default MoodScoreChart;
+export default SocialisationChart;

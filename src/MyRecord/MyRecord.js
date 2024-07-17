@@ -3,6 +3,10 @@ import { variables } from '../Variables';
 import { jwtDecode } from 'jwt-decode';
 import './MyRecord.css';
 import MoodScoreChart from '../Charts/MoodScoreChart';
+import ExerciseMinutesChart from '../Charts/ExerciseMinutesChart';
+import ProductivityScoreChart from '../Charts/ProductivityScoreChart';
+import SleepDurationChart from '../Charts/SleepDurationChart';
+import SocialisationChart from '../Charts/SocialisationChart';
 
 const MyRecord = () => {
     const [dailyRecords, setDailyRecords] = useState([]);
@@ -76,7 +80,22 @@ const MyRecord = () => {
                 <h3 className="text-xl font-semibold mb-4">Mood Scores Over Time</h3>
                 <MoodScoreChart studentId={studentId} />
             </div>
-
+            <div className="mb-6">
+                <h3 className="text-xl font-semibold mb-4">Exercise Minutes Over Time</h3>
+                <ExerciseMinutesChart studentId={studentId} />
+            </div>
+            <div className="mb-6">
+                <h3 className="text-xl font-semibold mb-4">Productivity Over Time</h3>
+                <ProductivityScoreChart studentId={studentId} />
+            </div>
+            <div className="mb-6">
+                <h3 className="text-xl font-semibold mb-4">Sleep Duration Over Time</h3>
+                <SleepDurationChart studentId={studentId} />
+            </div>
+            <div className="mb-6">
+                <h3 className="text-xl font-semibold mb-4">Socialisation Over Time</h3>
+                <SocialisationChart studentId={studentId} />
+            </div>
             {dailyRecords.length === 0 && quickTrackerRecords.length === 0 ? (
                 <p>No records found</p>
             ) : (
