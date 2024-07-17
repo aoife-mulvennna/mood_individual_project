@@ -72,11 +72,14 @@ const DateChart = ({ studentId }) => {
         let startDate;
 
         if (range === '7_days') {
-            startDate = new Date(now.setDate(now.getDate() - 7));
+            startDate = new Date();
+            startDate.setDate(startDate.getDate() - 7);
         } else if (range === '1_month') {
-            startDate = new Date(now.setMonth(now.getMonth() - 1));
+            startDate = new Date();
+            startDate.setMonth(startDate.getMonth() - 1);
         } else if (range === '1_year') {
-            startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+            startDate = new Date();
+            startDate.setFullYear(startDate.getFullYear() - 1);
         } else {
             startDate = new Date(0); // Default to all time if range is not recognized
         }
@@ -91,8 +94,19 @@ const DateChart = ({ studentId }) => {
         socialisation: filterDataByRange(socialisationScores.map(record => ({ x: new Date(record.daily_record_timestamp), y: record.socialisation_score })), selectedRange),
     };
 
+    const getMinDate = () => {
+        const now = new Date();
+        if (selectedRange === '7_days') {
+            return new Date(now.setDate(now.getDate() - 6));
+        } else if (selectedRange === '1_month') {
+            return new Date(now.setMonth(now.getMonth() - 1));
+        } else if (selectedRange === '1_year') {
+            return new Date(now.setFullYear(now.getFullYear() - 1));
+        }
+        return new Date(0);
+    };
+
     const chartData = {
-        labels: dateRange,
         datasets: [
             selectedMetrics.mood && {
                 label: 'Mood Score',
@@ -140,9 +154,11 @@ const DateChart = ({ studentId }) => {
             x: {
                 type: 'time',
                 time: {
-                    unit: 'day',
+                    unit: selectedRange === '1_year' ? 'month' : 'day',
                     tooltipFormat: 'dd/MM/yyyy',
                 },
+                min: getMinDate(),
+                max: new Date(),
             },
             yMood: {
                 type: 'linear',
@@ -211,78 +227,89 @@ const DateChart = ({ studentId }) => {
     };
 
     return (
-        <div>
-            <div className="mb-4">
-                <label>
-                    <input
-                        type="checkbox"
-                        name="mood"
-                        checked={selectedMetrics.mood}
-                        onChange={handleMetricChange}
-                    />
-                    Mood Score
-                </label>
-                <label>
-                    <input
-                        type="checkbox"
-                        name="exercise"
-                        checked={selectedMetrics.exercise}
-                        onChange={handleMetricChange}
-                    />
-                    Exercise Duration
-                </label>
-                <label>
-                    <input
-                        type="checkbox"
-                        name="sleep"
-                        checked={selectedMetrics.sleep}
-                        onChange={handleMetricChange}
-                    />
-                    Sleep Duration
-                </label>
-                <label>
-                    <input
-                        type="checkbox"
-                        name="socialisation"
-                        checked={selectedMetrics.socialisation}
-                        onChange={handleMetricChange}
-                    />
-                    Socialisation Score
-                </label>
+        <div className="bg-white p-6 rounded shadow-md flex flex-col lg:flex-row lg:space-x-6 lg:space-y-0 space-y-4">
+            <div className="flex-grow" style={{ height: '500px' }}>
+                <Line data={chartData} options={options} />
             </div>
-            <div className="mb-4">
-                <label>
-                    <input
-                        type="radio"
-                        name="dateRange"
-                        value="7_days"
-                        checked={selectedRange === '7_days'}
-                        onChange={handleRangeChange}
-                    />
-                    Last 7 Days
-                </label>
-                <label>
-                    <input
-                        type="radio"
-                        name="dateRange"
-                        value="1_month"
-                        checked={selectedRange === '1_month'}
-                        onChange={handleRangeChange}
-                    />
-                    Last Month
-                </label>
-                <label>
-                    <input
-                        type="radio"
-                        name="dateRange"
-                        value="1_year"
-                        checked={selectedRange === '1_year'}
-                        onChange={handleRangeChange}
-                    />
-                    Last Year
-                </label>
+            <div className="flex flex-col space-y-4">
+                <div className="flex flex-col space-y-2">
+                    <label className="flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            name="mood"
+                            checked={selectedMetrics.mood}
+                            onChange={handleMetricChange}
+                            className="form-checkbox h-4 w-4 text-blue-600"
+                        />
+                        <span>Mood Score</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            name="exercise"
+                            checked={selectedMetrics.exercise}
+                            onChange={handleMetricChange}
+                            className="form-checkbox h-4 w-4 text-blue-600"
+                        />
+                        <span>Exercise Duration</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            name="sleep"
+                            checked={selectedMetrics.sleep}
+                            onChange={handleMetricChange}
+                            className="form-checkbox h-4 w-4 text-blue-600"
+                        />
+                        <span>Sleep Duration</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            name="socialisation"
+                            checked={selectedMetrics.socialisation}
+                            onChange={handleMetricChange}
+                            className="form-checkbox h-4 w-4 text-blue-600"
+                        />
+                        <span>Socialisation Score</span>
+                    </label>
+                </div>
+                <div className="flex flex-col space-y-2">
+                    <label className="flex items-center space-x-2">
+                        <input
+                            type="radio"
+                            name="dateRange"
+                            value="7_days"
+                            checked={selectedRange === '7_days'}
+                            onChange={handleRangeChange}
+                            className="form-radio h-4 w-4 text-blue-600"
+                        />
+                        <span>Last 7 Days</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                        <input
+                            type="radio"
+                            name="dateRange"
+                            value="1_month"
+                            checked={selectedRange === '1_month'}
+                            onChange={handleRangeChange}
+                            className="form-radio h-4 w-4 text-blue-600"
+                        />
+                        <span>Last Month</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                        <input
+                            type="radio"
+                            name="dateRange"
+                            value="1_year"
+                            checked={selectedRange === '1_year'}
+                            onChange={handleRangeChange}
+                            className="form-radio h-4 w-4 text-blue-600"
+                        />
+                        <span>Last Year</span>
+                    </label>
+                </div>
             </div>
-            <Line data={chartData} options={options} />
         </div>
     );
 };

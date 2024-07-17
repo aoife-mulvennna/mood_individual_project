@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { variables } from '../Variables';
 import { jwtDecode } from 'jwt-decode';
 import DateChart from '../Charts/DateChart';
+import CustomAxisChart from '../Charts/CustomAxisChart';
 import './MyRecord.css';
 
 const MyRecord = () => {
@@ -75,6 +76,10 @@ const MyRecord = () => {
             <div className="mb-6">
                 <h3 className="text-xl font-semibold mb-4">Chart with Different Components</h3>
                 <DateChart studentId={studentId} />
+            </div>
+            <div className="mb-6">
+                <h3 className="text-xl font-semibold mb-4">Chart with Any</h3>
+                <CustomAxisChart studentId={studentId} />
             </div>
         </div>
     );
