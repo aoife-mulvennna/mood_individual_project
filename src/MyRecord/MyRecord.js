@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { variables } from '../Variables';
-import { jwtDecode } from 'jwt-decode'; 
+import { jwtDecode } from 'jwt-decode';
 import './MyRecord.css';
+import MoodScoreChart from '../Charts/MoodScoreChart';
 
 const MyRecord = () => {
     const [dailyRecords, setDailyRecords] = useState([]);
@@ -71,6 +72,11 @@ const MyRecord = () => {
     return (
         <div className="max-w-7xl mx-auto mt-12 p-6 bg-white rounded-lg shadow-lg">
             <h3 className="text-center text-2xl font-semibold mb-6 text-gray-800">My Records</h3>
+            <div className="mb-6">
+                <h3 className="text-xl font-semibold mb-4">Mood Scores Over Time</h3>
+                <MoodScoreChart studentId={studentId} />
+            </div>
+
             {dailyRecords.length === 0 && quickTrackerRecords.length === 0 ? (
                 <p>No records found</p>
             ) : (
