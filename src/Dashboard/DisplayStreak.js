@@ -5,28 +5,29 @@ const StreakDisplay = ({ studentId }) => {
     const [streakValue, setStreakValue] = useState(0);
 
     useEffect(() => {
-        const fetchStreak = async () => {
-            try {
-                console.log('Fetching streak for studentId:', studentId);
-                const response = await fetch(`${variables.API_URL}streak/${studentId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-                const data = await response.json();
-                console.log(data);
-                if (response.ok) {
-                    setStreakValue(data.streakValue);
-                } else {
-                    console.error('Error fetching streak:', data.message);
-                }
-            } catch (error) {
-                console.error('Error fetching streak:', error);
-            }
-        };
-
-        fetchStreak();
+        if (studentId) {
+            fetchStreak(studentId);
+        }
     }, [studentId]);
+
+    const fetchStreak = async (studentId) => {
+        try {
+            const response = await fetch(`${variables.API_URL}streak/${studentId}`, {
+                headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                }
+            });
+            const data = await response.json();
+            console.log('Fetched streak data(line 21) :', data);
+            if (response.ok) {
+                setStreakValue(data.streakValue);
+            } else {
+                console.error('Error fetching streak:', data.message);
+            }
+        } catch (error) {
+            console.error('Error fetching streak:', error);
+        }
+    };
 
     return (
         <div>
@@ -36,7 +37,6 @@ const StreakDisplay = ({ studentId }) => {
                 <p>You have no streak. Start recording in the daily tracker to build your streak!</p>
             )}
         </div>
-
     );
 };
 

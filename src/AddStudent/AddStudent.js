@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './AddStudent.css'; // You can create this file to style your form
 import { variables } from '../Variables'; // Ensure you have this imported correctly
 import { useNavigate, Link } from 'react-router-dom';
+import emailjs from 'emailjs-com';
 
 const AddStudentForm = () => {
     const [studentNumber, setStudentNumber] = useState('');
@@ -17,7 +18,6 @@ const AddStudentForm = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [accountExists, setAccountExists] = useState(false);
     const navigate = useNavigate();
-
 
     // Fetch course names and years when the component mounts
     useEffect(() => {
@@ -51,7 +51,7 @@ const AddStudentForm = () => {
     };
     const checkIfAccountExists = async (studentNumber, studentEmail) => {
         try {
-            const response = await fetch(`${variables.API_URL}students/check`, {
+            const response = await fetch(`${variables.API_URL}check-student`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -76,6 +76,21 @@ const AddStudentForm = () => {
         }
     }, [studentNumber, studentEmail]);
 
+    const sendEmail = (studentEmail, studentName) => {
+        const templateParams = {
+            user_name: studentName,
+            user_email: studentEmail,
+        };
+
+        emailjs.send('service_28erwgn', 'template_5ppe7gc', templateParams, 'aZlnGJW3rE0XE38uz')
+            .then((response) => {
+                console.log('Email sent successfully:', response.status, response.text);
+            })
+            .catch((err) => {
+                console.error('Failed to send email:', err);
+            });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -96,7 +111,7 @@ const AddStudentForm = () => {
         };
 
         try {
-            const response = await fetch(`${variables.API_URL}students`, {
+            const response = await fetch(`${variables.API_URL}create-student`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -112,12 +127,19 @@ const AddStudentForm = () => {
             setSuccessMessage('Student added successfully');
             setErrorMessage('');
             console.log('Student added successfully:', data.message);
+
+            sendEmail(studentEmail, studentName);
+            // Redirect to login page after successful account creation
+            navigate('/login');
         } catch (error) {
             setErrorMessage('Student Number or Email Address is already in use');
             setSuccessMessage('');
             console.error('Error adding student:', error.message);
         }
     };
+
+
+
 
     return (
         <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">

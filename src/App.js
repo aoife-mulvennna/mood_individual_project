@@ -11,6 +11,7 @@ import Info from './Info/Info'; // Import Info
 import Logout from './Logout/Logout'; // Import Logout component
 import AddStaff from './AddStaff';
 import MyRecord from './MyRecord/MyRecord';
+import SessionExpired from './SessionExpired';
 import './App.css';
 import qubLogo from './Photos/QUB_Logo.jpg';
 
@@ -156,6 +157,7 @@ const Main = () => {
           <Route path="/logout" element={<Logout />} />
           <Route path="/add-staff" element={<AddStaff />} />
           <Route path="/my-records" element={<MyRecord />} />
+          <Route path="/session-expired" element={<SessionExpired />} />
         </Routes>
       </div>
     </div>

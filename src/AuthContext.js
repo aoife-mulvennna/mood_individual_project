@@ -11,10 +11,17 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       const decoded = jwtDecode(token);
       setUser(decoded);
+      if (isTokenExpired(decoded)) {
+        logout();
+      }
     } else {
       setUser(null);
     }
   }, [token]);
+
+  const isTokenExpired = (decodedToken) => {
+    return decodedToken.exp * 1000 < Date.now();
+  };
 
   const login = (newToken) => {
     setToken(newToken);
