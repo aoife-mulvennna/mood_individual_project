@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { variables } from '../Variables';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 import DateChart from '../Charts/DateChart';
 import CustomAxisChart from '../Charts/CustomAxisChart';
 import './MyRecord.css';
@@ -63,22 +63,22 @@ const MyRecord = () => {
     };
 
     if (loading) {
-        return <p>Loading records...</p>;
+        return <p className="theme-secondary-text">Loading records...</p>;
     }
 
     if (error) {
-        return <p>{error}</p>;
+        return <p className="theme-accent-color">{error}</p>;
     }
 
     return (
-        <div className="max-w-7xl mx-auto mt-12 p-6 bg-white rounded-lg shadow-lg">
-            <h3 className="text-center text-2xl font-semibold mb-6 text-gray-800">My Records</h3>
+        <div className="max-w-7xl mx-auto mt-12 p-6 theme-primary-bg rounded-lg shadow-lg">
+            <h3 className="text-center text-2xl font-semibold mb-6 theme-primary-text">My Records</h3>
             <div className="mb-6">
-                <h3 className="text-xl font-semibold mb-4">Chart with Different Components</h3>
+                <h3 className="text-xl font-semibold mb-4 theme-primary-text">Chart with Different Components</h3>
                 <DateChart studentId={studentId} />
             </div>
             <div className="mb-6">
-                <h3 className="text-xl font-semibold mb-4">Chart with Any</h3>
+                <h3 className="text-xl font-semibold mb-4 theme-primary-text">Chart with Any</h3>
                 <CustomAxisChart studentId={studentId} />
             </div>
         </div>

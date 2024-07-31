@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 import { variables } from '../Variables.js';
-import { jwtDecode } from 'jwt-decode'; // Adjust the import path according to your project structure
+import { jwtDecode } from 'jwt-decode';
 import QuickTrack from './QuickTrack';
 import Flame from '../Photos/Flame.png';
 import Star from '../Photos/Star.png';
 import StreakDisplay from './DisplayStreak';
 import MyAssignments from './MyAssignments';
 import Stats from './Stats.js';
+import Resources from '../Resources/Resources';
 
 const Dashboard = () => {
     const [userName, setUserName] = useState('');
     const [studentId, setStudentId] = useState(null);
     const [assignments, setAssignments] = useState([]);
     const [streak, setStreak] = useState(0);
+    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+    }, [theme]);
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
@@ -22,9 +28,7 @@ const Dashboard = () => {
                 const decodedToken = jwtDecode(token);
                 if (decodedToken.exp * 1000 < Date.now()) {
                     console.error('Token has expired');
-                    // Handle token expiration (e.g., redirect to login)
                 } else {
-                    console.log('Decoded Token:', decodedToken); // Log the decoded token for debugging
                     fetchUserDetails(decodedToken.id);
                     setStudentId(decodedToken.id);
                     fetchAssignments(decodedToken.id);
@@ -97,7 +101,6 @@ const Dashboard = () => {
                 return response.json();
             })
             .then(data => {
-                console.log('Fetched streak data:', data); 
                 setStreak(data.streakValue);
             })
             .catch(error => {
@@ -106,27 +109,29 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto mt-12 p-6 bg-white rounded-lg shadow-lg">
-            <h3 className="text-center text-2xl font-semibold mb-6 text-gray-800">Welcome to Your Dashboard, {userName}, {studentId}</h3>
+        <div className="max-w-7xl mx-auto mt-12 p-6 theme-primary-bg rounded-lg shadow-lg">
+            <h3 className="text-center text-2xl font-semibold mb-6 theme-primary-text">Welcome to Your Dashboard, {userName}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="flex flex-col gap-6">
-                    <div className="p-6 bg-gray-100 rounded-lg shadow">
-                        <h5 className="text-lg font-semibold mb-4 flex items-center">Quick Track</h5>
+                    <div className="p-6 theme-secondary-bg rounded-lg shadow">
+                        <h5 className="text-lg font-semibold mb-4 theme-primary-text flex items-center">Quick Track</h5>
                         <QuickTrack />
                     </div>
                     <Stats studentId={studentId} />
                 </div>
                 <div className="flex flex-col gap-6">
                     <MyAssignments studentId={studentId} />
-                    <div className="p-6 bg-gray-100 rounded-lg shadow">
-                        <h5 className="text-lg font-semibold mb-4 flex items-center">Recent Activity</h5>
+                    <div className="p-6 theme-secondary-bg rounded-lg shadow">
+                        <h5 className="text-lg font-semibold mb-4 theme-primary-text flex items-center">Recent Activity</h5>
                     </div>
                 </div>
                 <div className="flex flex-col gap-6">
-                    <div className="p-6 bg-gray-100 rounded-lg shadow">
-                        <h5 className="text-lg font-semibold mb-4 flex items-center">Streak <img src={Flame} className="w-6 h-6 ml-2" alt='Flame' /></h5>
+                    <div className="p-6 theme-secondary-bg rounded-lg shadow">
+                        <h5 className="text-lg font-semibold mb-4 theme-primary-text flex items-center">Streak <img src={Flame} className="w-6 h-6 ml-2" alt='Flame' /></h5>
                         <StreakDisplay studentId={studentId} />
                     </div>
+                    {/* Include the Resources component */}
+                    <Resources limit={3} />
                 </div>
             </div>
         </div>

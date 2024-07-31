@@ -123,7 +123,6 @@ const QuickTrack = () => {
                 alert(data.message);
                 setCooldownRemainingSeconds(cooldownPeriodSeconds);
                 refreshMoods();
-                
             })
             .catch(error => {
                 alert('Failed: ' + error.message);
@@ -137,25 +136,13 @@ const QuickTrack = () => {
         return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
     };
 
-    // useEffect(() => {
-    //     let interval;
-
-    //     if (cooldownRemainingSeconds > 0) {
-    //         interval = setInterval(() => {
-    //             setCooldownRemainingSeconds(prevSeconds => prevSeconds - 1);
-    //         }, 1000);
-    //     }
-
-    //     return () => clearInterval(interval);
-    // }, [cooldownRemainingSeconds]);
-
     return (
         <div className="quick-track">
             <div className="form-group">
-                <p className="text-center mb-4">How do you feel now?</p>
+                <p className="text-center mb-4 theme-primary-text">How do you feel now?</p>
                 <div className="flex justify-center gap-2 mb-4">
                     {moods.length === 0 ? (
-                        <p>Loading moods...</p>
+                        <p className="theme-secondary-text">Loading moods...</p>
                     ) : (
                         moods.map(mood => (
                             <img
@@ -170,10 +157,10 @@ const QuickTrack = () => {
                 </div>
                 {cooldownRemainingSeconds > 0 ? (
                     <div>
-                        <p className="text-center">You can submit another entry in {formatTime(cooldownRemainingSeconds)}</p>
+                        <p className="text-center theme-secondary-text">You can submit another entry in {formatTime(cooldownRemainingSeconds)}</p>
                     </div>
                 ) : (
-                    <button className="flex justify-center items-center tick-button mx-auto mt-4 text-white px-4 py-2 rounded hover:scale-110 transition-transform " onClick={handleSubmit}>
+                    <button className="flex justify-center items-center tick-button mx-auto mt-4 theme-button-bg theme-button-text px-4 py-2 rounded hover:scale-110 transition-transform" onClick={handleSubmit}>
                         <img src={Tick} className="tick" alt="Submit" />
                     </button>
                 )}

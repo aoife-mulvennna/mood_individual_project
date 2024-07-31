@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './AddStudent.css'; // You can create this file to style your form
 import { variables } from '../Variables'; // Ensure you have this imported correctly
 import { useNavigate, Link } from 'react-router-dom';
-import emailjs from 'emailjs-com';
+import sendEmail from '../emailUtils'; // import the utility function
 
 const AddStudentForm = () => {
     const [studentNumber, setStudentNumber] = useState('');
@@ -14,6 +14,9 @@ const AddStudentForm = () => {
     const [courseYears, setCourseYears] = useState([]);
     const [selectedCourseYear, setSelectedCourseYear] = useState('');
     const [studentPassword, setStudentPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [visiblePasswordField, setVisiblePasswordField] = useState(null); // State to manage which password field is visible
+    const [passwordsMatch, setPasswordsMatch] = useState(true); // State to check if passwords match
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [accountExists, setAccountExists] = useState(false);
@@ -49,14 +52,15 @@ const AddStudentForm = () => {
     const validateEmail = (email) => {
         return email.endsWith('@qub.ac.uk');
     };
-    const checkIfAccountExists = async (studentNumber, studentEmail) => {
+
+    const checkIfAccountExists = async (studentNumber) => {
         try {
             const response = await fetch(`${variables.API_URL}check-student`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ studentNumber, studentEmail }),
+                body: JSON.stringify({ studentNumber }),
             });
 
             const data = await response.json();
@@ -71,31 +75,22 @@ const AddStudentForm = () => {
     };
 
     useEffect(() => {
-        if (studentNumber || studentEmail) {
-            checkIfAccountExists(studentNumber, studentEmail);
+        if (studentNumber) {
+            checkIfAccountExists(studentNumber);
         }
-    }, [studentNumber, studentEmail]);
-
-    const sendEmail = (studentEmail, studentName) => {
-        const templateParams = {
-            user_name: studentName,
-            user_email: studentEmail,
-        };
-
-        emailjs.send('service_28erwgn', 'template_5ppe7gc', templateParams, 'aZlnGJW3rE0XE38uz')
-            .then((response) => {
-                console.log('Email sent successfully:', response.status, response.text);
-            })
-            .catch((err) => {
-                console.error('Failed to send email:', err);
-            });
-    };
+    }, [studentNumber]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!validateEmail(studentEmail)) {
             setErrorMessage('Please use your QUB email address.');
+            setSuccessMessage('');
+            return;
+        }
+
+        if (!passwordsMatch) {
+            setErrorMessage('Passwords do not match.');
             setSuccessMessage('');
             return;
         }
@@ -128,21 +123,35 @@ const AddStudentForm = () => {
             setErrorMessage('');
             console.log('Student added successfully:', data.message);
 
-            sendEmail(studentEmail, studentName);
+            const emailMessage = `Hello ${studentName},\n\nYour account has been successfully created. Welcome!`;
+            const loginLink = `${variables.FRONTEND_URL}/login`; // Link to the login page
+            sendEmail(studentEmail, 'Account Created Successfully', emailMessage, '', loginLink);
+
             // Redirect to login page after successful account creation
             navigate('/login');
         } catch (error) {
-            setErrorMessage('Student Number or Email Address is already in use');
+            setErrorMessage(error.message);
             setSuccessMessage('');
             console.error('Error adding student:', error.message);
         }
     };
 
+    const togglePasswordVisibility = (field) => {
+        setVisiblePasswordField(visiblePasswordField === field ? null : field);
+    };
 
+    const handlePasswordChange = (e) => {
+        setStudentPassword(e.target.value);
+        setPasswordsMatch(e.target.value === confirmPassword);
+    };
 
+    const handleConfirmPasswordChange = (e) => {
+        setConfirmPassword(e.target.value);
+        setPasswordsMatch(e.target.value === studentPassword);
+    };
 
     return (
-        <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
+        <div className="min-h-screen">
             <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
                 <h2 className="text-2xl font-bold text-center mb-6">Create New Account</h2>
                 {successMessage && (
@@ -151,133 +160,175 @@ const AddStudentForm = () => {
                 {errorMessage && (
                     <div className="text-red-500 text-center mb-4">{errorMessage}</div>
                 )}
-                {accountExists && (
-                    <div className="text-center mb-4">
-                        <p className="text-red-500">
+                <form className="space-y-4" onSubmit={handleSubmit}>
+                    {accountExists && (
+                        <div className="text-red-500 text-center mb-4">
                             It looks like you already have an account.
-                        </p>
+                        </div>
+                    )}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Student Number
+                        </label>
+                        <input
+                            type="number"
+                            value={studentNumber}
+                            onChange={(e) => setStudentNumber(e.target.value)}
+                            required
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                        />
                     </div>
-                )}
-                {!accountExists && (
-                    <form className="space-y-4" onSubmit={handleSubmit}>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                                Student Number
-                            </label>
-                            <input
-                                type="number"
-                                value={studentNumber}
-                                onChange={(e) => setStudentNumber(e.target.value)}
-                                required
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                                Student Name
-                            </label>
-                            <input
-                                type="text"
-                                value={studentName}
-                                onChange={(e) => setStudentName(e.target.value)}
-                                required
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                                Date of Birth
-                            </label>
-                            <input
-                                type="date"
-                                value={dateOfBirth}
-                                onChange={(e) => setDateOfBirth(e.target.value)}
-                                required
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                                Student Email
-                            </label>
-                            <input
-                                type="email"
-                                value={studentEmail}
-                                onChange={(e) => setStudentEmail(e.target.value)}
-                                required
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                                Course Name
-                            </label>
-                            <select
-                                value={selectedCourseName}
-                                onChange={(e) => setSelectedCourseName(e.target.value)}
-                                required
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                            >
-                                <option value="">Select Course Name</option>
-                                {courseNames.map((course) => (
-                                    <option key={course.course_id} value={course.course_name}>
-                                        {course.course_name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                                Course Year
-                            </label>
-                            <select
-                                value={selectedCourseYear}
-                                onChange={(e) => setSelectedCourseYear(e.target.value)}
-                                required
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                            >
-                                <option value="">Select Course Year</option>
-                                {courseYears.map((year) => (
-                                    <option key={year.academic_year_id} value={year.academic_year_name}>
-                                        {year.academic_year_name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                                Student Password
-                            </label>
-                            <input
-                                type="password"
-                                value={studentPassword}
-                                onChange={(e) => setStudentPassword(e.target.value)}
-                                required
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                            />
-                        </div>
-                        <div className="flex justify-center">
-                            <button
-                                type="submit"
-                                className="bg-red-500 text-white px-6 py-2 rounded-md font-semibold hover:bg-red-600 transition"
-                            >
-                                Create Account
-                            </button>
-                        </div>
-                        <p className="text-gray-700">
-                            Already have an account?{' '}
-                            <Link to="/login" className="text-red-500 hover:underline">
-                                Login here
-                            </Link>
-                        </p>
-                        <p className="text-gray-700">
-                            Want to go back?{' '}
-                            <button onClick={() => navigate('/')} className="text-red-500 hover:underline">
-                                Go back
-                            </button>
-                        </p>
-                    </form>
-                )}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Student Name
+                        </label>
+                        <input
+                            type="text"
+                            value={studentName}
+                            onChange={(e) => setStudentName(e.target.value)}
+                            required
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Date of Birth
+                        </label>
+                        <input
+                            type="date"
+                            value={dateOfBirth}
+                            onChange={(e) => setDateOfBirth(e.target.value)}
+                            required
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Student Email
+                        </label>
+                        <input
+                            type="email"
+                            value={studentEmail}
+                            onChange={(e) => setStudentEmail(e.target.value)}
+                            required
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Course Name
+                        </label>
+                        <select
+                            value={selectedCourseName}
+                            onChange={(e) => setSelectedCourseName(e.target.value)}
+                            required
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                        >
+                            <option value="">Select Course Name</option>
+                            {courseNames.map((course) => (
+                                <option key={course.course_id} value={course.course_name}>
+                                    {course.course_name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Course Year
+                        </label>
+                        <select
+                            value={selectedCourseYear}
+                            onChange={(e) => setSelectedCourseYear(e.target.value)}
+                            required
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                        >
+                            <option value="">Select Course Year</option>
+                            {courseYears.map((year) => (
+                                <option key={year.academic_year_id} value={year.academic_year_name}>
+                                    {year.academic_year_name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="relative">
+                        <label className="block text-sm font-medium text-gray-700">
+                            Student Password
+                        </label>
+                        <input
+                            type={visiblePasswordField === 'studentPassword' ? "text" : "password"}
+                            value={studentPassword}
+                            onChange={handlePasswordChange}
+                            required
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                        />
+                        <span
+                            onClick={() => togglePasswordVisibility('studentPassword')}
+                            className="absolute right-5 bottom-2 cursor-pointer text-gray-500"
+                        >
+                            {visiblePasswordField === 'studentPassword' ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 1 0 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                </svg>
+                            )}
+                        </span>
+                    </div>
+                    <div className="relative">
+                        <label className="block text-sm font-medium text-gray-700">
+                            Confirm Password
+                        </label>
+                        <input
+                            type={visiblePasswordField === 'confirmPassword' ? "text" : "password"}
+                            value={confirmPassword}
+                            onChange={handleConfirmPasswordChange}
+                            required
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                        />
+                        <span
+                            onClick={() => togglePasswordVisibility('confirmPassword')}
+                            className="absolute right-5 bottom-2 cursor-pointer text-gray-500"
+                        >
+                            {visiblePasswordField === 'confirmPassword' ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 0 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 1 0 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                </svg>
+                            )}
+                        </span>
+                    </div>
+                    {!passwordsMatch && (
+                        <p className="text-red-500 text-center mt-2">Passwords do not match</p>
+                    )}
+                    <div className="flex justify-center">
+                        <button
+                            type="submit"
+                            className="bg-red-500 text-white px-6 py-2 rounded-md font-semibold hover:bg-red-600 transition"
+                            disabled={!passwordsMatch}
+                        >
+                            Create Account
+                        </button>
+                    </div>
+                    <p className="text-gray-700">
+                        Already have an account?{' '}
+                        <Link to="/login" className="text-red-500 hover:underline">
+                            Login here
+                        </Link>
+                    </p>
+                    <p className="text-gray-700">
+                        Want to go back?{' '}
+                        <button onClick={() => navigate('/')} className="text-red-500 hover:underline">
+                            Go back
+                        </button>
+                    </p>
+                </form>
             </div>
         </div>
     );

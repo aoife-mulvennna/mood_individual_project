@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { variables } from '../Variables';
-import jwtDecode from 'jwt-decode';
 import Star from '../Photos/Star.png';
 
 const Stats = ({ studentId }) => {
@@ -46,23 +45,23 @@ const Stats = ({ studentId }) => {
     };
 
     return (
-        <div className="p-6 bg-gray-100 rounded-lg shadow">
-            <h5 className="text-lg font-semibold mb-4 flex items-center">Stats <img src={Star} className="w-6 h-6 ml-2" alt='Star' /></h5>
+        <div className="p-6 theme-secondary-bg rounded-lg shadow">
+            <h5 className="text-lg font-semibold mb-4 flex items-center theme-primary-text">Stats <img src={Star} className="w-6 h-6 ml-2" alt='Star' /></h5>
             <div className="space-y-2">
-            <div className="flex justify-between items-center">
-                    <span>Mood</span>
+                <div className="flex justify-between items-center">
+                    <span className="theme-primary-text">Mood</span>
                     {getTrendIcon(stats.mood)}
                 </div>
                 <div className="flex justify-between items-center">
-                    <span>Exercise Minutes</span>
+                    <span className="theme-primary-text">Exercise Minutes</span>
                     {getTrendIcon(stats.exercise)}
                 </div>
                 <div className="flex justify-between items-center">
-                    <span>Sleep Length</span>
+                    <span className="theme-primary-text">Sleep Length</span>
                     {getTrendIcon(stats.sleep)}
                 </div>
                 <div className="flex justify-between items-center">
-                    <span>Socialisation</span>
+                    <span className="theme-primary-text">Socialisation</span>
                     {getTrendIcon(stats.socialisation)}
                 </div>
             </div>

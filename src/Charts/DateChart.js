@@ -26,6 +26,23 @@ const generateDateRange = (startDate, endDate) => {
     return dateArray;
 };
 
+const aggregateByDate = (data, key) => {
+    const result = {};
+    data.forEach(record => {
+        const date = new Date(record.daily_record_timestamp).toISOString().split('T')[0];
+        if (!result[date]) {
+            result[date] = { count: 0, total: 0 };
+        }
+        result[date].count += 1;
+        result[date].total += record[key];
+    });
+
+    return Object.keys(result).map(date => ({
+        x: new Date(date),
+        y: result[date].total / result[date].count,
+    }));
+};
+
 const fetchData = async (userId, endpoint) => {
     const response = await fetch(`${variables.API_URL}${endpoint}/${userId}`, {
         headers: {
@@ -51,18 +68,18 @@ const DateChart = ({ studentId }) => {
 
     useEffect(() => {
         if (studentId) {
-            fetchData(studentId, 'mood-scores').then(data => setMoodScores(data.moodScores));
-            fetchData(studentId, 'exercise-minutes').then(data => setExerciseDurations(data.exerciseMinutes));
-            fetchData(studentId, 'sleep-durations').then(data => setSleepDurations(data.sleepDurations));
-            fetchData(studentId, 'socialisation').then(data => setSocialisationScores(data.socialisationScores));
+            fetchData(studentId, 'mood-scores').then(data => setMoodScores(aggregateByDate(data.moodScores, 'mood_score')));
+            fetchData(studentId, 'exercise-minutes').then(data => setExerciseDurations(aggregateByDate(data.exerciseMinutes, 'exercise_duration')));
+            fetchData(studentId, 'sleep-durations').then(data => setSleepDurations(aggregateByDate(data.sleepDurations, 'sleep_duration')));
+            fetchData(studentId, 'socialisation').then(data => setSocialisationScores(aggregateByDate(data.socialisationScores, 'socialisation_score')));
         }
     }, [studentId]);
 
     useEffect(() => {
         const allData = [...moodScores, ...exerciseDurations, ...sleepDurations, ...socialisationScores];
         if (allData.length > 0) {
-            const startDate = allData.reduce((min, p) => p.daily_record_timestamp < min ? p.daily_record_timestamp : min, allData[0].daily_record_timestamp);
-            const endDate = allData.reduce((max, p) => p.daily_record_timestamp > max ? p.daily_record_timestamp : max, allData[0].daily_record_timestamp);
+            const startDate = allData.reduce((min, p) => p.x < min ? p.x : min, allData[0].x);
+            const endDate = allData.reduce((max, p) => p.x > max ? p.x : max, allData[0].x);
             setDateRange(generateDateRange(startDate, endDate));
         }
     }, [moodScores, exerciseDurations, sleepDurations, socialisationScores]);
@@ -88,10 +105,10 @@ const DateChart = ({ studentId }) => {
     };
 
     const dataPoints = {
-        mood: filterDataByRange(moodScores.map(record => ({ x: new Date(record.daily_record_timestamp), y: record.mood_score })), selectedRange),
-        exercise: filterDataByRange(exerciseDurations.map(record => ({ x: new Date(record.daily_record_timestamp), y: record.exercise_duration })), selectedRange),
-        sleep: filterDataByRange(sleepDurations.map(record => ({ x: new Date(record.daily_record_timestamp), y: record.sleep_duration })), selectedRange),
-        socialisation: filterDataByRange(socialisationScores.map(record => ({ x: new Date(record.daily_record_timestamp), y: record.socialisation_score })), selectedRange),
+        mood: filterDataByRange(moodScores, selectedRange),
+        exercise: filterDataByRange(exerciseDurations, selectedRange),
+        sleep: filterDataByRange(sleepDurations, selectedRange),
+        socialisation: filterDataByRange(socialisationScores, selectedRange),
     };
 
     const getMinDate = () => {
@@ -177,7 +194,7 @@ const DateChart = ({ studentId }) => {
                 type: 'linear',
                 position: 'left',
                 min: 0,
-                max: 60,
+                
                 ticks: {
                     stepSize: 10,
                 },

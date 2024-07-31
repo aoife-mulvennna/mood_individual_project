@@ -1,0 +1,78 @@
+/* themes.css */
+:root {
+  --theme-primary-bg: white;
+  --theme-primary-text: black;
+  --theme-secondary-bg: #f9f9f9;
+  --theme-secondary-text: #555;
+  --theme-button-bg: #007bff;
+  --theme-button-text: white;
+  --theme-topbar-bg: #f1f1f1;
+  --theme-accent-color: #d32f2f;
+}
+
+[data-theme="dark"] {
+  --theme-primary-bg: #2c2c2c;
+  --theme-primary-text: #e0e0e0;
+  --theme-secondary-bg: #3a3a3a;
+  --theme-secondary-text: #bbbbbb;
+  --theme-button-bg: #444444;
+  --theme-button-text: white;
+  --theme-topbar-bg: #1f1f1f;
+  --theme-accent-color: #d32f2f;
+}
+
+[data-theme="pink"] {
+  --theme-primary-bg: #ffe4e1;
+  --theme-primary-text: #000000;
+  --theme-secondary-bg: #ffb6c1;
+  --theme-secondary-text: #333333;
+  --theme-button-bg: #ff69b4;
+  --theme-button-text: white;
+  --theme-topbar-bg: #ffccd5;
+  --theme-accent-color: #ff4081;
+}
+
+body {
+  background-color: var(--theme-primary-bg);
+  color: var(--theme-primary-text);
+}
+
+.theme-primary-bg {
+  background-color: var(--theme-primary-bg);
+}
+
+.theme-primary-text {
+    color: var(--theme-primary-text) !important;
+  }
+
+.theme-secondary-bg {
+  background-color: var(--theme-secondary-bg);
+}
+
+.theme-secondary-text {
+  color: var(--theme-secondary-text);
+}
+
+.theme-button-bg {
+  background-color: var(--theme-button-bg);
+}
+
+.theme-button-text {
+  color: var(--theme-button-text);
+}
+
+.theme-topbar-bg {
+  background-color: var(--theme-topbar-bg);
+}
+
+.theme-accent-color {
+  color: var(--theme-accent-color);
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+.nav-link.active-link {
+  color: var(--theme-accent-color);
+}

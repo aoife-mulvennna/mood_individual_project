@@ -1,74 +1,91 @@
 .add-student-form {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .add-student-form h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  
-  .add-student-form form {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  
-  .add-student-form label {
-    width: 100%;
-    margin-bottom: 15px;
-  }
-  
-  .add-student-form label > input,
-  .add-student-form label > select {
-    width: calc(100% - 20px);
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .add-student-form label > select {
-    cursor: pointer;
-  }
-  
-  .add-student-form label > input[type='date'] {
-    width: calc(100% - 20px);
-  }
-  
-  .add-student-form button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  .add-student-form button:hover {
-    background-color: #b71709;
-  }
-  
-  .add-student-form .success-message {
-    margin: 10px 0;
-    padding: 10px;
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-    border-radius: 4px;
-  }
-  
-  .add-student-form .error-message {
-    margin: 10px 0;
-    padding: 10px;
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-    border-radius: 4px;
-  }
-  
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.add-student-form h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.add-student-form form {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.add-student-form label {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.add-student-form label>input,
+.add-student-form label>select {
+  width: calc(100% - 20px);
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.add-student-form label>select {
+  cursor: pointer;
+}
+
+.add-student-form label>input[type='date'] {
+  width: calc(100% - 20px);
+}
+
+.add-student-form button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.add-student-form button:hover {
+  background-color: #b71709;
+}
+
+.add-student-form .success-message {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+}
+
+.add-student-form .error-message {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+}
+
+
+.min-h-screen {
+  background-image: url('../Photos/Background.png');
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
