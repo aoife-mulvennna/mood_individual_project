@@ -25,7 +25,7 @@ const Resources = ({ limit }) => {
             <ul className="list-none pl-0">
                 {resources.map((resource, index) => (
                     <li key={index} className="mb-4">
-                        <a href={resource.resource_link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                        <a href={resource.resource_link} target="_blank" rel="noopener noreferrer" className="theme-text-primary hover:underline">
                             {resource.resource_name}
                         </a>
                         <div className="text-sm text-gray-500">{new Date(resource.resource_added_date).toLocaleDateString()}</div>
