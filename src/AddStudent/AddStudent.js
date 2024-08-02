@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import './AddStudent.css'; // You can create this file to style your form
 import { variables } from '../Variables'; // Ensure you have this imported correctly
 import { useNavigate, Link } from 'react-router-dom';
-import sendEmail from '../emailUtils'; // import the utility function
 
 const AddStudentForm = () => {
     const [studentNumber, setStudentNumber] = useState('');
@@ -122,10 +121,6 @@ const AddStudentForm = () => {
             setSuccessMessage('Student added successfully');
             setErrorMessage('');
             console.log('Student added successfully:', data.message);
-
-            const emailMessage = `Hello ${studentName},\n\nYour account has been successfully created. Welcome!`;
-            const loginLink = `${variables.FRONTEND_URL}/login`; // Link to the login page
-            sendEmail(studentEmail, 'Account Created Successfully', emailMessage, '', loginLink);
 
             // Redirect to login page after successful account creation
             navigate('/login');

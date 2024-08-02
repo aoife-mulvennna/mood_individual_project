@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { variables } from '../Variables';
 import { useNavigate } from 'react-router-dom';
-import sendEmail from '../emailUtils'; // import the utility function
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
@@ -23,13 +22,6 @@ const ForgotPassword = () => {
             const data = await response.json();
             if (response.ok) {
                 setMessage('A reset link has been sent to your email address.');
-
-                // Send email using emailjs
-                const resetLink = `${variables.FRONTEND_URL}/reset-password/${data.token}`;
-                const emailMessage = `Click the following link to reset your password.`;
-
-                sendEmail(email, 'Password Reset Request', emailMessage, resetLink);
-
             } else {
                 setMessage(data.message || 'Failed to send reset link.');
             }
