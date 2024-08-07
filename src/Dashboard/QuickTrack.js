@@ -139,7 +139,7 @@ const QuickTrack = () => {
     return (
         <div className="quick-track">
             <div className="form-group">
-                <p className="text-center mb-4 theme-primary-text">How do you feel now?</p>
+                <p className="text-center mb-4 theme-primary-text text-xl">How do you feel now?</p>
                 <div className="flex justify-center gap-2 mb-4">
                     {moods.length === 0 ? (
                         <p className="theme-secondary-text">Loading moods...</p>

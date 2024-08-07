@@ -30,15 +30,17 @@ const CustomAxisChart = ({ studentId }) => {
     const [exerciseDurations, setExerciseDurations] = useState([]);
     const [sleepDurations, setSleepDurations] = useState([]);
     const [socialisationScores, setSocialisationScores] = useState([]);
+    const [productivityScores, setProductivityScores] = useState([]);
     const [xAxis, setXAxis] = useState('mood');
     const [yAxis, setYAxis] = useState('exercise');
 
     useEffect(() => {
         if (studentId) {
             fetchData(studentId, 'mood-scores').then(data => setMoodScores(data.moodScores));
-            fetchData(studentId, 'exercise-minutes').then(data => setExerciseDurations(data.exerciseMinutes));
-            fetchData(studentId, 'sleep-durations').then(data => setSleepDurations(data.sleepDurations));
+            fetchData(studentId, 'exercise-time').then(data => setExerciseDurations(data.exerciseTime));
+            fetchData(studentId, 'sleep-rating').then(data => setSleepDurations(data.sleepRating));
             fetchData(studentId, 'socialisation').then(data => setSocialisationScores(data.socialisationScores));
+            fetchData(studentId, 'productivity-scores').then(data => setProductivityScores(data.productivityScores));
         }
     }, [studentId]);
 
@@ -49,14 +51,16 @@ const CustomAxisChart = ({ studentId }) => {
             ...moodScores.map(record => record.daily_record_timestamp),
             ...exerciseDurations.map(record => record.daily_record_timestamp),
             ...sleepDurations.map(record => record.daily_record_timestamp),
-            ...socialisationScores.map(record => record.daily_record_timestamp)
+            ...socialisationScores.map(record => record.daily_record_timestamp),
+            ...productivityScores.map(record => record.daily_record_timestamp)
         ])];
 
         allDates.forEach(date => {
             const mood = moodScores.find(record => record.daily_record_timestamp === date)?.mood_score;
-            const exercise = exerciseDurations.find(record => record.daily_record_timestamp === date)?.exercise_duration;
-            const sleep = sleepDurations.find(record => record.daily_record_timestamp === date)?.sleep_duration;
+            const exercise = exerciseDurations.find(record => record.daily_record_timestamp === date)?.exercise_score;
+            const sleep = sleepDurations.find(record => record.daily_record_timestamp === date)?.sleep_id;
             const socialisation = socialisationScores.find(record => record.daily_record_timestamp === date)?.socialisation_score;
+            const productivity = productivityScores.find(record => record.daily_record_timestamp === date)?.productivity_score;
 
             const point = {
                 x: eval(xAxis),
@@ -131,18 +135,20 @@ const CustomAxisChart = ({ studentId }) => {
                     <label className="mr-2">X-Axis:</label>
                     <select value={xAxis} onChange={(e) => setXAxis(e.target.value)} className="form-select">
                         <option value="mood">Mood Score</option>
-                        <option value="exercise">Exercise Duration</option>
-                        <option value="sleep">Sleep Duration</option>
+                        <option value="exercise">Exercise Score</option>
+                        <option value="sleep">Sleep Score</option>
                         <option value="socialisation">Socialisation Score</option>
+                        <option value="productivity">Productivity Score</option>
                     </select>
                 </div>
                 <div>
                     <label className="mr-2">Y-Axis:</label>
                     <select value={yAxis} onChange={(e) => setYAxis(e.target.value)} className="form-select">
                         <option value="mood">Mood Score</option>
-                        <option value="exercise">Exercise Duration</option>
-                        <option value="sleep">Sleep Duration</option>
+                        <option value="exercise">Exercise Score</option>
+                        <option value="sleep">Sleep Score</option>
                         <option value="socialisation">Socialisation Score</option>
+                        <option value="productivity">Productivity Score</option>
                     </select>
                 </div>
             </div>

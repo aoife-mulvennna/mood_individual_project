@@ -8,12 +8,15 @@ import ResetPassword from './Login/ResetPassword';
 import AddStudent from './AddStudent/AddStudent';
 import LandingPage from './LandingPage/LandingPage';
 import Dashboard from './Dashboard/Dashboard';
+import ContactUs from './Dashboard/ContactUs';
+import Variables from './Variables';
 import MyAccount from './MyAccount/MyAccount'; // Import MyAccount
 import Info from './Info/Info'; // Import Info
 import Logout from './Logout/Logout'; // Import Logout component
 import AddStaff from './AddStaff';
 import MyRecord from './MyRecord/MyRecord';
-import ResourcesPage from './Resources/Resources';
+import ResourcesPage from './Resources/ResourcesPage';
+import Resources from './Resources/Resources';
 import SessionExpired from './SessionExpired';
 import './App.css';
 import qubLogo from './Photos/QUB_Logo.jpg';
@@ -52,34 +55,40 @@ const Main = () => {
             <div className="flex items-center hidden lg:flex lg:w-0 lg:items-center lg:justify-end lg:flex-1 lg:gap-x-12">
               <nav className="navbar flex gap-4">
                 <NavLink
-                  className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text' : 'nav-link theme-primary-text')}
+                  className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
                   to="/dashboard"
                 >
                   Dashboard
                 </NavLink>
                 <NavLink
-                  className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text' : 'nav-link theme-primary-text')}
+                  className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
                   to="/daily"
                 >
                   Daily Tracker
                 </NavLink>
                 <NavLink
-                  className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text' : 'nav-link theme-primary-text')}
+                  className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
                   to="/my-records"
                 >
                   My Records
                 </NavLink>
                 <NavLink
-                  className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text' : 'nav-link theme-primary-text')}
+                  className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
                   to="/info"
                 >
                   Info
                 </NavLink>
                 <NavLink
-                  className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text' : 'nav-link theme-primary-text')}
+                  className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
                   to="/my-account"
                 >
                   My Account
+                </NavLink>
+                <NavLink
+                  className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
+                  to="/resources"
+                >
+                  Resources
                 </NavLink>
 
                 <NavLink className="nav-link grey-button theme-button-bg theme-button-text" to="/logout">Sign out</NavLink>
@@ -102,42 +111,49 @@ const Main = () => {
             <button className="mb-4 theme-button-bg theme-button-text px-3 py-2 rounded" onClick={toggleSidebar}>Close</button>
             <nav className="flex flex-col gap-4">
               <NavLink
-                className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text' : 'nav-link theme-primary-text')}
+                className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
                 to="/dashboard"
                 onClick={toggleSidebar}
               >
                 Dashboard
               </NavLink>
               <NavLink
-                className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text' : 'nav-link theme-primary-text')}
+                className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
                 to="/daily"
                 onClick={toggleSidebar}
               >
                 Daily Tracker
               </NavLink>
               <NavLink
-                className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text' : 'nav-link theme-primary-text')}
+                className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
                 to="/my-records"
                 onClick={toggleSidebar}
               >
                 My Records
               </NavLink>
               <NavLink
-                className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text' : 'nav-link theme-primary-text')}
+                className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
                 to="/info"
                 onClick={toggleSidebar}
               >
                 Info
               </NavLink>
               <NavLink
-                className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text' : 'nav-link theme-primary-text')}
+                className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
                 to="/my-account"
                 onClick={toggleSidebar}
               >
                 My Account
               </NavLink>
+              <NavLink
+                className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
+                to="/resources"
+                onClick={toggleSidebar}
+              >
+                Resources
+              </NavLink>
 
-              <NavLink className="nav-link grey-button theme-button-bg theme-button-text" to="/logout" onClick={toggleSidebar}>Sign out</NavLink>
+              <NavLink className="nav-link grey-button theme-button-bg theme-button-text " to="/logout" onClick={toggleSidebar}>Sign out</NavLink>
             </nav>
           </div>
         </>
@@ -155,6 +171,7 @@ const Main = () => {
           <Route path="/info" element={<Info />} /> {/* Route to Info page */}
           <Route path="/my-account" element={<MyAccount />} /> {/* Route to My Account page */}
           <Route path="/logout" element={<Logout />} />
+          <Route path="/contact-us" element={<ContactUs/>}/>
           <Route path="/add-staff" element={<AddStaff />} />
           <Route path="/my-records" element={<MyRecord />} />
           <Route path="/session-expired" element={<SessionExpired />} />

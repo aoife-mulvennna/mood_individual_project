@@ -57,32 +57,35 @@ const DateChart = ({ studentId }) => {
     const [exerciseDurations, setExerciseDurations] = useState([]);
     const [sleepDurations, setSleepDurations] = useState([]);
     const [socialisationScores, setSocialisationScores] = useState([]);
+    const [productivityScores, setProductivityScores] = useState([]);
     const [dateRange, setDateRange] = useState([]);
     const [selectedMetrics, setSelectedMetrics] = useState({
         mood: true,
         exercise: false,
         sleep: false,
         socialisation: false,
+        productivity: false,
     });
     const [selectedRange, setSelectedRange] = useState('7_days');
 
     useEffect(() => {
         if (studentId) {
             fetchData(studentId, 'mood-scores').then(data => setMoodScores(aggregateByDate(data.moodScores, 'mood_score')));
-            fetchData(studentId, 'exercise-minutes').then(data => setExerciseDurations(aggregateByDate(data.exerciseMinutes, 'exercise_duration')));
-            fetchData(studentId, 'sleep-durations').then(data => setSleepDurations(aggregateByDate(data.sleepDurations, 'sleep_duration')));
+            fetchData(studentId, 'exercise-time').then(data => setExerciseDurations(aggregateByDate(data.exerciseTime, 'exercise_score')));
+            fetchData(studentId, 'sleep-rating').then(data => setSleepDurations(aggregateByDate(data.sleepRating, 'sleep_score')));
             fetchData(studentId, 'socialisation').then(data => setSocialisationScores(aggregateByDate(data.socialisationScores, 'socialisation_score')));
+            fetchData(studentId, 'productivity-scores').then(data => setProductivityScores(aggregateByDate(data.productivityScores, 'productivity_score')));
         }
     }, [studentId]);
 
     useEffect(() => {
-        const allData = [...moodScores, ...exerciseDurations, ...sleepDurations, ...socialisationScores];
+        const allData = [...moodScores, ...exerciseDurations, ...sleepDurations, ...socialisationScores, ...productivityScores];
         if (allData.length > 0) {
             const startDate = allData.reduce((min, p) => p.x < min ? p.x : min, allData[0].x);
             const endDate = allData.reduce((max, p) => p.x > max ? p.x : max, allData[0].x);
             setDateRange(generateDateRange(startDate, endDate));
         }
-    }, [moodScores, exerciseDurations, sleepDurations, socialisationScores]);
+    }, [moodScores, exerciseDurations, sleepDurations, socialisationScores, productivityScores]);
 
     const filterDataByRange = (data, range) => {
         const now = new Date();
@@ -109,6 +112,7 @@ const DateChart = ({ studentId }) => {
         exercise: filterDataByRange(exerciseDurations, selectedRange),
         sleep: filterDataByRange(sleepDurations, selectedRange),
         socialisation: filterDataByRange(socialisationScores, selectedRange),
+        productivity: filterDataByRange(productivityScores, selectedRange),
     };
 
     const getMinDate = () => {
@@ -133,14 +137,14 @@ const DateChart = ({ studentId }) => {
                 tension: 0.1,
             },
             selectedMetrics.exercise && {
-                label: 'Exercise Duration (min)',
+                label: 'Exercise Score',
                 data: dataPoints.exercise,
                 yAxisID: 'yExercise',
                 borderColor: 'rgb(255, 99, 132)',
                 tension: 0.1,
             },
             selectedMetrics.sleep && {
-                label: 'Sleep Duration (hours)',
+                label: 'Sleep Rating',
                 data: dataPoints.sleep,
                 yAxisID: 'ySleep',
                 borderColor: 'rgb(54, 162, 235)',
@@ -151,6 +155,13 @@ const DateChart = ({ studentId }) => {
                 data: dataPoints.socialisation,
                 yAxisID: 'ySocialisation',
                 borderColor: 'rgb(255, 206, 86)',
+                tension: 0.1,
+            },
+            selectedMetrics.productivity && {
+                label: 'Productivity Score',
+                data: dataPoints.productivity,
+                yAxisID: 'yProductivity',
+                borderColor: 'rgb(153, 102, 255)',
                 tension: 0.1,
             },
         ].filter(Boolean),
@@ -194,13 +205,12 @@ const DateChart = ({ studentId }) => {
                 type: 'linear',
                 position: 'left',
                 min: 0,
-                
                 ticks: {
                     stepSize: 10,
                 },
                 title: {
                     display: true,
-                    text: 'Exercise Duration (min)'
+                    text: 'Exercise Score'
                 }
             },
             ySleep: {
@@ -213,7 +223,7 @@ const DateChart = ({ studentId }) => {
                 },
                 title: {
                     display: true,
-                    text: 'Sleep Duration (hours)'
+                    text: 'Sleep Rating'
                 }
             },
             ySocialisation: {
@@ -227,6 +237,19 @@ const DateChart = ({ studentId }) => {
                 title: {
                     display: true,
                     text: 'Socialisation Score'
+                }
+            },
+            yProductivity: {
+                type: 'linear',
+                position: 'left',
+                min: 0,
+                max: 5,
+                ticks: {
+                    stepSize: 1,
+                },
+                title: {
+                    display: true,
+                    text: 'Productivity Score'
                 }
             }
         },
@@ -268,7 +291,7 @@ const DateChart = ({ studentId }) => {
                             onChange={handleMetricChange}
                             className="form-checkbox h-4 w-4 text-blue-600"
                         />
-                        <span>Exercise Duration</span>
+                        <span>Exercise Score</span>
                     </label>
                     <label className="flex items-center space-x-2">
                         <input
@@ -278,7 +301,7 @@ const DateChart = ({ studentId }) => {
                             onChange={handleMetricChange}
                             className="form-checkbox h-4 w-4 text-blue-600"
                         />
-                        <span>Sleep Duration</span>
+                        <span>Sleep Rating</span>
                     </label>
                     <label className="flex items-center space-x-2">
                         <input
@@ -289,6 +312,16 @@ const DateChart = ({ studentId }) => {
                             className="form-checkbox h-4 w-4 text-blue-600"
                         />
                         <span>Socialisation Score</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            name="productivity"
+                            checked={selectedMetrics.productivity}
+                            onChange={handleMetricChange}
+                            className="form-checkbox h-4 w-4 text-blue-600"
+                        />
+                        <span>Productivity Score</span>
                     </label>
                 </div>
                 <div className="flex flex-col space-y-2">
