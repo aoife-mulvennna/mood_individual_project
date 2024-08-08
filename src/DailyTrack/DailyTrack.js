@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { variables } from '../Variables.js';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import "./DailyTrack.css";
 
 const DailyTrack = () => {
@@ -8,12 +8,15 @@ const DailyTrack = () => {
     const [socialisations, setSocialisations] = useState([]);
     const [exercises, setExercises] = useState([]);
     const [sleeps, setSleeps] = useState([]);
+    const [tags, setTags] = useState([]);
 
     const [selectedMood, setSelectedMood] = useState('');
     const [selectedExercise, setSelectedExercise] = useState('');
     const [selectedSleep, setSelectedSleep] = useState('');
     const [selectedSocialisation, setSelectedSocialisation] = useState('');
     const [selectedProductivity, setSelectedProductivity] = useState('');
+    const [selectedTags, setSelectedTags] = useState([]);
+
     const [studentName, setStudentName] = useState('');
     const [studentId, setStudentId] = useState('');
     const [token, setToken] = useState('');
@@ -40,6 +43,7 @@ const DailyTrack = () => {
         fetchSocialisations(token);
         fetchExercises(token);
         fetchSleeps(token);
+        fetchTags(token);
     };
 
     const fetchStudentName = (id, token) => {
@@ -48,13 +52,13 @@ const DailyTrack = () => {
                 'Authorization': `Bearer ${token}`
             }
         })
-        .then(response => response.json())
-        .then(data => {
-            setStudentName(data.student_name);
-        })
-        .catch(error => {
-            console.error('Error fetching student name:', error);
-        });
+            .then(response => response.json())
+            .then(data => {
+                setStudentName(data.student_name);
+            })
+            .catch(error => {
+                console.error('Error fetching student name:', error);
+            });
     };
 
     const checkTrackedStatus = async (token) => {
@@ -127,6 +131,20 @@ const DailyTrack = () => {
         }
     };
 
+    const fetchTags = async () => {
+        try {
+            const response = await fetch(variables.API_URL + 'tags', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            setTags(data);
+        } catch (error) {
+            console.error('Error fetching tags:', error);
+        }
+    };
+
     const handleMoodSelection = (mood) => {
         setSelectedMood(mood.mood_id);
     };
@@ -146,6 +164,16 @@ const DailyTrack = () => {
     const handleProductivityChange = (value) => {
         setSelectedProductivity(value);
     };
+    const handleTagSelection = (tag) => {
+        setSelectedTags(prevSelectedTags => {
+            if (prevSelectedTags.includes(tag.tag_id)) {
+                return prevSelectedTags.filter(id => id !== tag.tag_id);
+            } else {
+                return [...prevSelectedTags, tag.tag_id];
+            }
+        });
+    };
+
 
     const handleSubmit = async () => {
         try {
@@ -153,7 +181,7 @@ const DailyTrack = () => {
                 alert('No token found, please log in again.');
                 return;
             }
-
+    
             const response = await fetch(variables.API_URL + 'daily-track', {
                 method: 'POST',
                 headers: {
@@ -167,15 +195,16 @@ const DailyTrack = () => {
                     exercise_id: selectedExercise,
                     sleep_id: selectedSleep,
                     socialisation_id: selectedSocialisation,
-                    productivity_score: selectedProductivity
+                    productivity_score: selectedProductivity,
+                    tags: selectedTags
                 })
             });
-
+    
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error('Failed: ' + errorText);
             }
-
+    
             const data = await response.json();
             alert(data.message);
             refreshMoods(token);
@@ -183,6 +212,7 @@ const DailyTrack = () => {
             alert('Failed: ' + error.message);
         }
     };
+    
 
     if (alreadyTracked) {
         return (
@@ -205,19 +235,22 @@ const DailyTrack = () => {
                             {moods.length === 0 ? (
                                 <p className="theme-secondary-text">Loading moods...</p>
                             ) : (
-                                moods.map(mood => (
-                                    <button
-                                        key={mood.mood_id}
-                                        type="button"
-                                        className={`btn mood-button px-3 py-2 rounded transition ${selectedMood === mood.mood_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
-                                        onClick={() => handleMoodSelection(mood)}
-                                    >
-                                        {mood.mood_name}
-                                    </button>
-                                ))
+                                [...moods]
+                                    .sort((a, b) => a.mood_score - b.mood_score)  // Sort moods by mood_score
+                                    .map(mood => (
+                                        <button
+                                            key={mood.mood_id}
+                                            type="button"
+                                            className={`btn mood-button px-3 py-2 rounded transition ${selectedMood === mood.mood_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                            onClick={() => handleMoodSelection(mood)}
+                                        >
+                                            {mood.mood_name}
+                                        </button>
+                                    ))
                             )}
                         </div>
                     </div>
+
                     <div className="form-group mb-6">
                         <label className="block theme-primary-text text-lg mb-2">How many minutes of exercise did you complete today?</label>
                         <div className="flex flex-wrap gap-2 justify-center">
@@ -290,6 +323,26 @@ const DailyTrack = () => {
                             ))}
                         </div>
                     </div>
+                    <div className="form-group mb-6">
+                        <label className="block theme-primary-text text-lg mb-2">Tags:</label>
+                        <div className="flex flex-wrap gap-2 justify-center">
+                            {tags.length === 0 ? (
+                                <p className="theme-secondary-text">Loading tags...</p>
+                            ) : (
+                                tags.map(tag => (
+                                    <button
+                                        key={tag.tag_id}
+                                        type="button"
+                                        className={`btn tag-button px-3 py-2 rounded-lg transition ${selectedTags.includes(tag.tag_id) ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                        onClick={() => handleTagSelection(tag)}
+                                    >
+                                        {tag.tag_name}
+                                    </button>
+                                ))
+                            )}
+                        </div>
+                    </div>
+
                     <div className="form-group text-center">
                         <button type="button" className="btn submit-button theme-button-bg theme-button-text px-6 py-2 rounded hover:opacity-80" onClick={handleSubmit}>
                             Submit

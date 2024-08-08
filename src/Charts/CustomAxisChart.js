@@ -25,6 +25,42 @@ const fetchData = async (userId, endpoint) => {
     return response.json();
 };
 
+
+const fetchMoods = async () => {
+    const response = await fetch(`${variables.API_URL}mood`, {
+        headers: {
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+    });
+    return response.json();
+};
+const fetchExercises = async () => {
+    const response = await fetch(`${variables.API_URL}exercises`, {
+        headers: {
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+    });
+    return response.json();
+};
+
+const fetchSleep = async () => {
+    const response = await fetch(`${variables.API_URL}sleeps`, {
+        headers: {
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+    });
+    return response.json();
+};
+
+const fetchSocialisations = async () => {
+    const response = await fetch(`${variables.API_URL}socialisations`, {
+        headers: {
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+    });
+    return response.json();
+};
+
 const CustomAxisChart = ({ studentId }) => {
     const [moodScores, setMoodScores] = useState([]);
     const [exerciseDurations, setExerciseDurations] = useState([]);
@@ -33,6 +69,10 @@ const CustomAxisChart = ({ studentId }) => {
     const [productivityScores, setProductivityScores] = useState([]);
     const [xAxis, setXAxis] = useState('mood');
     const [yAxis, setYAxis] = useState('exercise');
+    const [moodNameMap, setMoodNameMap] = useState({});
+    const [exerciseNameMap, setExerciseNameMap] = useState({});
+    const [sleepNameMap, setSleepNameMap] = useState({});
+    const [socialisationNameMap, setSocialisationNameMap] = useState({});
 
     useEffect(() => {
         if (studentId) {
@@ -41,6 +81,34 @@ const CustomAxisChart = ({ studentId }) => {
             fetchData(studentId, 'sleep-rating').then(data => setSleepDurations(data.sleepRating));
             fetchData(studentId, 'socialisation').then(data => setSocialisationScores(data.socialisationScores));
             fetchData(studentId, 'productivity-scores').then(data => setProductivityScores(data.productivityScores));
+            fetchMoods().then(data => {
+                const moodMap = {};
+                data.forEach(mood => {
+                    moodMap[mood.mood_score] = mood.mood_name;
+                });
+                setMoodNameMap(moodMap);
+            });
+            fetchExercises().then(data => {
+                const exerciseMap = {};
+                data.forEach(exercise => {
+                    exerciseMap[exercise.exercise_score] = exercise.exercise_name;
+                });
+                setExerciseNameMap(exerciseMap);
+            });
+            fetchSleep().then(data => {
+                const sleepMap = {};
+                data.forEach(sleep => {
+                    sleepMap[sleep.sleep_score] = sleep.sleep_name;
+                });
+                setSleepNameMap(sleepMap);
+            });
+            fetchSocialisations().then(data => {
+                const socialisationMap = {};
+                data.forEach(socialisation => {
+                    socialisationMap[socialisation.socialisation_score] = socialisation.socialisation_name;
+                });
+                setSocialisationNameMap(socialisationMap);
+            });
         }
     }, [studentId]);
 
@@ -75,6 +143,23 @@ const CustomAxisChart = ({ studentId }) => {
         return dataPoints;
     };
 
+    const getAxisOptions = (axis, nameMap) => ({
+        type: 'linear',
+        position: 'left',
+        min: 0,
+        max: 5,
+        ticks: {
+            stepSize: 1,
+            callback: function (value) {
+                return nameMap[value] || value;
+            }
+        },
+        title: {
+            display: true,
+            text: axis.charAt(0).toUpperCase() + axis.slice(1)
+        }
+    });
+
     const chartData = {
         datasets: [
             {
@@ -82,7 +167,7 @@ const CustomAxisChart = ({ studentId }) => {
                 data: getDataPoints(),
                 backgroundColor: 'rgba(75, 192, 192, 0.6)',
                 borderColor: 'rgba(75, 192, 192, 1)',
-                pointRadius: 3,
+                pointRadius: 0,
                 pointHoverRadius: 10,
                 trendlineLinear: {
                     style: "rgba(255,105,180, .8)",
@@ -101,27 +186,38 @@ const CustomAxisChart = ({ studentId }) => {
                 position: 'top',
             },
             title: {
-                display: true,
-                text: 'Custom Axis Chart',
+                // display: true,
+                // text: 'Custom Axis Chart',
             },
         },
         scales: {
-            x: {
-                type: 'linear',
-                position: 'bottom',
-                title: {
-                    display: true,
-                    text: `${xAxis.charAt(0).toUpperCase() + xAxis.slice(1)}`,
-                },
-            },
-            y: {
-                type: 'linear',
-                position: 'left',
-                title: {
-                    display: true,
-                    text: `${yAxis.charAt(0).toUpperCase() + yAxis.slice(1)}`,
-                },
-            },
+            x: xAxis === 'mood' ? getAxisOptions(xAxis, moodNameMap, 'bottom') :
+                xAxis === 'exercise' ? getAxisOptions(xAxis, exerciseNameMap, 'bottom') :
+                    xAxis === 'sleep' ? getAxisOptions(xAxis, sleepNameMap, 'bottom') :
+                        xAxis === 'socialisation' ? getAxisOptions(xAxis, socialisationNameMap, 'bottom') : {
+                            type: 'linear',
+                            position: 'bottom',
+                            min: 0,
+                            max: 5,
+                            title: {
+                                display: true,
+                                text: xAxis.charAt(0).toUpperCase() + xAxis.slice(1),
+                            },
+                        },
+            y: yAxis === 'mood' ? getAxisOptions(yAxis, moodNameMap, 'left') :
+                yAxis === 'exercise' ? getAxisOptions(yAxis, exerciseNameMap, 'left') :
+                    yAxis === 'sleep' ? getAxisOptions(yAxis, sleepNameMap, 'left') :
+                        yAxis === 'socialisation' ? getAxisOptions(yAxis, socialisationNameMap, 'left') : {
+                            type: 'linear',
+                            position: 'left',
+                            min: 0,
+                            max: 5,
+                            title: {
+                                display: true,
+                                text: yAxis.charAt(0).toUpperCase() + yAxis.slice(1),
+                            },
+                        },
+
         },
     };
 
@@ -134,21 +230,21 @@ const CustomAxisChart = ({ studentId }) => {
                 <div>
                     <label className="mr-2">X-Axis:</label>
                     <select value={xAxis} onChange={(e) => setXAxis(e.target.value)} className="form-select">
-                        <option value="mood">Mood Score</option>
-                        <option value="exercise">Exercise Score</option>
-                        <option value="sleep">Sleep Score</option>
-                        <option value="socialisation">Socialisation Score</option>
-                        <option value="productivity">Productivity Score</option>
+                        <option value="mood">Mood</option>
+                        <option value="exercise">Exercise</option>
+                        <option value="sleep">Sleep</option>
+                        <option value="socialisation">Socialisation</option>
+                        <option value="productivity">Productivity</option>
                     </select>
                 </div>
                 <div>
                     <label className="mr-2">Y-Axis:</label>
                     <select value={yAxis} onChange={(e) => setYAxis(e.target.value)} className="form-select">
-                        <option value="mood">Mood Score</option>
-                        <option value="exercise">Exercise Score</option>
-                        <option value="sleep">Sleep Score</option>
-                        <option value="socialisation">Socialisation Score</option>
-                        <option value="productivity">Productivity Score</option>
+                        <option value="mood">Mood</option>
+                        <option value="exercise">Exercise</option>
+                        <option value="sleep">Sleep</option>
+                        <option value="socialisation">Socialisation</option>
+                        <option value="productivity">Productivity</option>
                     </select>
                 </div>
             </div>

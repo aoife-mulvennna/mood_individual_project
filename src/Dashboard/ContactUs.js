@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { variables } from '../Variables';
 import { jwtDecode } from 'jwt-decode';
+
 const ContactUs = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState(null);
@@ -106,7 +107,14 @@ const ContactUs = () => {
             rows="6"
           />
         </div>
-        <div className="flex justify-center">
+        <div className="flex justify-center mb-4 space-x-4">
+          <button
+            type="button"
+            className="bg-gray-500 text-white px-4 py-2 rounded-md font-semibold hover:bg-gray-600 transition"
+            onClick={() => navigate('/')}
+          >
+            Go Back
+          </button>
           <button
             type="submit"
             className="bg-blue-500 text-white px-4 py-2 rounded-md font-semibold hover:bg-blue-600 transition"

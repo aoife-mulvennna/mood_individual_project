@@ -52,6 +52,41 @@ const fetchData = async (userId, endpoint) => {
     return response.json();
 };
 
+const fetchMoods = async () => {
+    const response = await fetch(`${variables.API_URL}mood`, {
+        headers: {
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+    });
+    return response.json();
+};
+const fetchExercises = async () => {
+    const response = await fetch(`${variables.API_URL}exercises`, {
+        headers: {
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+    });
+    return response.json();
+};
+
+const fetchSleep = async () => {
+    const response = await fetch(`${variables.API_URL}sleeps`, {
+        headers: {
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+    });
+    return response.json();
+};
+
+const fetchSocialisations = async () => {
+    const response = await fetch(`${variables.API_URL}socialisations`, {
+        headers: {
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+    });
+    return response.json();
+};
+
 const DateChart = ({ studentId }) => {
     const [moodScores, setMoodScores] = useState([]);
     const [exerciseDurations, setExerciseDurations] = useState([]);
@@ -67,6 +102,10 @@ const DateChart = ({ studentId }) => {
         productivity: false,
     });
     const [selectedRange, setSelectedRange] = useState('7_days');
+    const [moodNameMap, setMoodNameMap] = useState({});
+    const [exerciseNameMap, setExerciseNameMap] = useState({});
+    const [sleepNameMap, setSleepNameMap] = useState({});
+    const [socialisationNameMap, setSocialisationNameMap] = useState({});
 
     useEffect(() => {
         if (studentId) {
@@ -75,6 +114,34 @@ const DateChart = ({ studentId }) => {
             fetchData(studentId, 'sleep-rating').then(data => setSleepDurations(aggregateByDate(data.sleepRating, 'sleep_score')));
             fetchData(studentId, 'socialisation').then(data => setSocialisationScores(aggregateByDate(data.socialisationScores, 'socialisation_score')));
             fetchData(studentId, 'productivity-scores').then(data => setProductivityScores(aggregateByDate(data.productivityScores, 'productivity_score')));
+            fetchMoods().then(data => {
+                const moodMap = {};
+                data.forEach(mood => {
+                    moodMap[mood.mood_score] = mood.mood_name;
+                });
+                setMoodNameMap(moodMap);
+            });
+            fetchExercises().then(data => {
+                const exerciseMap = {};
+                data.forEach(exercise => {
+                    exerciseMap[exercise.exercise_score] = exercise.exercise_name;
+                });
+                setExerciseNameMap(exerciseMap);
+            });
+            fetchSleep().then(data => {
+                const sleepMap = {};
+                data.forEach(sleep => {
+                    sleepMap[sleep.sleep_score] = sleep.sleep_name;
+                });
+                setSleepNameMap(sleepMap);
+            });
+            fetchSocialisations().then(data => {
+                const socialisationMap = {};
+                data.forEach(socialisation => {
+                    socialisationMap[socialisation.socialisation_score] = socialisation.socialisation_name;
+                });
+                setSocialisationNameMap(socialisationMap);
+            });
         }
     }, [studentId]);
 
@@ -126,39 +193,146 @@ const DateChart = ({ studentId }) => {
         }
         return new Date(0);
     };
+    const getYAxisOptions = (selectedMetrics, moodNameMap, exerciseNameMap, sleepNameMap, socialisationNameMap) => {
+        const yAxisOptions = {};
+
+        if (selectedMetrics.mood) {
+            yAxisOptions.yMood = {
+                type: 'linear',
+                position: 'left',
+                min: 1,
+                max: 5,
+                ticks: {
+                    stepSize: 1,
+                    callback: function (value) {
+                        return moodNameMap[value] || value;
+                    },
+                    maxRotation: 38,
+                    minRotation: 38
+                },
+                title: {
+                    display: true,
+                    text: 'Mood'
+                }
+            };
+        }
+
+        if (selectedMetrics.exercise) {
+            yAxisOptions.yExercise = {
+                type: 'linear',
+                position: 'left',
+                min: 1,
+                max: 5,
+                ticks: {
+                    stepSize: 1,
+                    callback: function (value) {
+                        return exerciseNameMap[value] || value;
+                    },
+                    maxRotation: 38,
+                    minRotation: 38
+                },
+                title: {
+                    display: true,
+                    text: 'Exercise'
+                }
+            };
+        }
+
+        if (selectedMetrics.sleep) {
+            yAxisOptions.ySleep = {
+                type: 'linear',
+                position: 'right',
+                min: 1,
+                max: 5,
+                ticks: {
+                    stepSize: 1,
+                    callback: function (value) {
+                        return sleepNameMap[value] || value;
+                    },
+                    maxRotation: 38,
+                    minRotation: 38
+                },
+                title: {
+                    display: true,
+                    text: 'Sleep'
+                }
+            };
+        }
+
+        if (selectedMetrics.socialisation) {
+            yAxisOptions.ySocialisation = {
+                type: 'linear',
+                position: 'right',
+                min: 1,
+                max: 5,
+                ticks: {
+                    stepSize: 1,
+                    callback: function (value) {
+                        return socialisationNameMap[value] || value;
+                    },
+                    maxRotation: 38,
+                    minRotation: 38
+                },
+                title: {
+                    display: true,
+                    text: 'Socialisation'
+                }
+            };
+        }
+
+        if (selectedMetrics.productivity) {
+            yAxisOptions.yProductivity = {
+                type: 'linear',
+                position: 'left',
+                min: 0,
+                max: 5,
+                ticks: {
+                    stepSize: 1,
+                        maxRotation: 38,
+                    minRotation: 38
+                },
+                title: {
+                    display: true,
+                    text: 'Productivity'
+                }
+            };
+        }
+
+        return yAxisOptions;
+    };
 
     const chartData = {
         datasets: [
             selectedMetrics.mood && {
-                label: 'Mood Score',
+                label: 'Mood',
                 data: dataPoints.mood,
                 yAxisID: 'yMood',
                 borderColor: 'rgb(75, 192, 192)',
                 tension: 0.1,
             },
             selectedMetrics.exercise && {
-                label: 'Exercise Score',
+                label: 'Exercise',
                 data: dataPoints.exercise,
                 yAxisID: 'yExercise',
                 borderColor: 'rgb(255, 99, 132)',
                 tension: 0.1,
             },
             selectedMetrics.sleep && {
-                label: 'Sleep Rating',
+                label: 'Sleep',
                 data: dataPoints.sleep,
                 yAxisID: 'ySleep',
                 borderColor: 'rgb(54, 162, 235)',
                 tension: 0.1,
             },
             selectedMetrics.socialisation && {
-                label: 'Socialisation Score',
+                label: 'Socialisation',
                 data: dataPoints.socialisation,
                 yAxisID: 'ySocialisation',
                 borderColor: 'rgb(255, 206, 86)',
                 tension: 0.1,
             },
             selectedMetrics.productivity && {
-                label: 'Productivity Score',
+                label: 'Productivity',
                 data: dataPoints.productivity,
                 yAxisID: 'yProductivity',
                 borderColor: 'rgb(153, 102, 255)',
@@ -166,6 +340,7 @@ const DateChart = ({ studentId }) => {
             },
         ].filter(Boolean),
     };
+
 
     const options = {
         responsive: true,
@@ -175,7 +350,7 @@ const DateChart = ({ studentId }) => {
             },
             title: {
                 display: true,
-                text: 'Metrics Over Time',
+                //text: 'Metrics Over Time',
             },
         },
         scales: {
@@ -187,71 +362,13 @@ const DateChart = ({ studentId }) => {
                 },
                 min: getMinDate(),
                 max: new Date(),
-            },
-            yMood: {
-                type: 'linear',
-                position: 'left',
-                min: 1,
-                max: 5,
                 ticks: {
-                    stepSize: 1,
-                },
-                title: {
-                    display: true,
-                    text: 'Mood Score'
+                    autoSkip: false,
+                    maxRotation: 45,
+                    minRotation: 45
                 }
             },
-            yExercise: {
-                type: 'linear',
-                position: 'left',
-                min: 0,
-                ticks: {
-                    stepSize: 10,
-                },
-                title: {
-                    display: true,
-                    text: 'Exercise Score'
-                }
-            },
-            ySleep: {
-                type: 'linear',
-                position: 'right',
-                min: 0,
-                max: 12,
-                ticks: {
-                    stepSize: 1,
-                },
-                title: {
-                    display: true,
-                    text: 'Sleep Rating'
-                }
-            },
-            ySocialisation: {
-                type: 'linear',
-                position: 'right',
-                min: 0,
-                max: 4,
-                ticks: {
-                    stepSize: 1,
-                },
-                title: {
-                    display: true,
-                    text: 'Socialisation Score'
-                }
-            },
-            yProductivity: {
-                type: 'linear',
-                position: 'left',
-                min: 0,
-                max: 5,
-                ticks: {
-                    stepSize: 1,
-                },
-                title: {
-                    display: true,
-                    text: 'Productivity Score'
-                }
-            }
+            ...getYAxisOptions(selectedMetrics, moodNameMap, exerciseNameMap, sleepNameMap, socialisationNameMap)
         },
     };
 
@@ -281,7 +398,7 @@ const DateChart = ({ studentId }) => {
                             onChange={handleMetricChange}
                             className="form-checkbox h-4 w-4 text-blue-600"
                         />
-                        <span>Mood Score</span>
+                        <span>Mood</span>
                     </label>
                     <label className="flex items-center space-x-2">
                         <input
@@ -291,7 +408,7 @@ const DateChart = ({ studentId }) => {
                             onChange={handleMetricChange}
                             className="form-checkbox h-4 w-4 text-blue-600"
                         />
-                        <span>Exercise Score</span>
+                        <span>Exercise</span>
                     </label>
                     <label className="flex items-center space-x-2">
                         <input
@@ -301,7 +418,7 @@ const DateChart = ({ studentId }) => {
                             onChange={handleMetricChange}
                             className="form-checkbox h-4 w-4 text-blue-600"
                         />
-                        <span>Sleep Rating</span>
+                        <span>Sleep</span>
                     </label>
                     <label className="flex items-center space-x-2">
                         <input
@@ -311,7 +428,7 @@ const DateChart = ({ studentId }) => {
                             onChange={handleMetricChange}
                             className="form-checkbox h-4 w-4 text-blue-600"
                         />
-                        <span>Socialisation Score</span>
+                        <span>Socialisation</span>
                     </label>
                     <label className="flex items-center space-x-2">
                         <input
@@ -321,7 +438,7 @@ const DateChart = ({ studentId }) => {
                             onChange={handleMetricChange}
                             className="form-checkbox h-4 w-4 text-blue-600"
                         />
-                        <span>Productivity Score</span>
+                        <span>Productivity</span>
                     </label>
                 </div>
                 <div className="flex flex-col space-y-2">
