@@ -3,6 +3,14 @@ import { variables } from '../Variables';
 import Star from '../Photos/Star.png';
 
 const Stats = ({ studentId }) => {
+    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+      }, [theme]);
+
+      
     const [stats, setStats] = useState({
         today: {
             mood: null,
@@ -70,18 +78,18 @@ const Stats = ({ studentId }) => {
     };
 
     return (
-        <div className="max-w-md mx-auto p-6 theme-secondary-bg rounded-lg shadow-md">
+        <div className="max-w-md mx-auto p-6 theme-secondary-bg rounded-lg">
             <div className="flex items-center justify-center mb-4">
-                <h5 className="text-xl font-semibold text-gray-800">Stats</h5>
+                <h5 className="text-xl font-semibold theme-secondary-text">Stats</h5>
                 <p><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
 </svg>
 </p>
             </div>
             <div className="grid grid-cols-3 gap-4">
-                <div className="text-center font-semibold text-gray-600">Feature</div>
-                <div className="text-center font-semibold text-gray-600">Today</div>
-                <div className="text-center font-semibold text-gray-600">Avg (7 Days)</div>
+                <div className="text-center font-semibold theme-secondary-text ">Feature</div>
+                <div className="text-center font-semibold theme-secondary-text">Today</div>
+                <div className="text-center font-semibold theme-secondary-text">Avg (7 Days)</div>
                 {[
                     { label: 'Mood', key: 'mood' },
                     { label: 'Exercise', key: 'exercise' },
@@ -90,9 +98,9 @@ const Stats = ({ studentId }) => {
                     { label: 'Productivity', key: 'productivity' }
                 ].map((item) => (
                     <React.Fragment key={item.key}>
-                        <div className="text-center text-gray-700">{item.label}</div>
-                        <div className="text-center text-gray-700 flex items-center justify-center space-x-2">{stats.today[item.key]}/5   {getTodayIcon(stats.today[item.key])}</div>
-                        <div className="text-center text-gray-700 flex items-center justify-center">
+                        <div className="text-center theme-secondary-text">{item.label}</div>
+                        <div className="text-center theme-secondary-text flex items-center justify-center space-x-2">{stats.today[item.key]}/5   {getTodayIcon(stats.today[item.key])}</div>
+                        <div className="text-center theme-secondary-text flex items-center justify-center">
                             {stats.averages[item.key]}/5 {getTrendIcon(stats.trends[item.key])}
                         </div>
                     </React.Fragment>

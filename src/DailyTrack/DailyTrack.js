@@ -20,7 +20,6 @@ const DailyTrack = () => {
     const [studentName, setStudentName] = useState('');
     const [studentId, setStudentId] = useState('');
     const [token, setToken] = useState('');
-    const [alreadyTracked, setAlreadyTracked] = useState(false);
 
     useEffect(() => {
         const storedToken = sessionStorage.getItem('token');
@@ -30,15 +29,54 @@ const DailyTrack = () => {
                 setStudentId(decoded.id);
                 setToken(storedToken);
                 fetchStudentData(decoded.id, storedToken);
+                fetchSavedSelections(decoded.id, storedToken);
             } catch (error) {
                 console.error('Error decoding token:', error);
             }
         }
     }, []);
 
+    const fetchSavedSelections = async (id, token) => {
+        try {
+            const response = await fetch(variables.API_URL + `daily-track/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    // No record found for today, reset selections to defaults
+                    console.log('No daily record found for today.');
+                    // Ensure the form is in a state to accept new data
+                    setSelectedMood('');
+                    setSelectedExercise('');
+                    setSelectedSleep('');
+                    setSelectedSocialisation('');
+                    setSelectedProductivity('');
+                    setSelectedTags([]);
+                    return;
+                } else {
+                    throw new Error('Failed to fetch saved selections');
+                }
+            }
+
+            const data = await response.json();
+
+            setSelectedMood(data.mood_id);
+            setSelectedExercise(data.exercise_id);
+            setSelectedSleep(data.sleep_id);
+            setSelectedSocialisation(data.socialisation_id);
+            setSelectedProductivity(data.productivity_score);
+            setSelectedTags(data.tags);
+
+        } catch (error) {
+            console.error('Error fetching saved selections:', error);
+        }
+    };
+
     const fetchStudentData = async (id, token) => {
         await fetchStudentName(id, token);
-        await checkTrackedStatus(token);
         refreshMoods(token);
         fetchSocialisations(token);
         fetchExercises(token);
@@ -59,20 +97,6 @@ const DailyTrack = () => {
             .catch(error => {
                 console.error('Error fetching student name:', error);
             });
-    };
-
-    const checkTrackedStatus = async (token) => {
-        try {
-            const response = await fetch(variables.API_URL + 'mood/status', {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                }
-            });
-            const data = await response.json();
-            setAlreadyTracked(data.alreadyTracked);
-        } catch (error) {
-            console.error('Error checking tracked status:', error);
-        }
     };
 
     const refreshMoods = async () => {
@@ -164,6 +188,7 @@ const DailyTrack = () => {
     const handleProductivityChange = (value) => {
         setSelectedProductivity(value);
     };
+
     const handleTagSelection = (tag) => {
         setSelectedTags(prevSelectedTags => {
             if (prevSelectedTags.includes(tag.tag_id)) {
@@ -174,14 +199,13 @@ const DailyTrack = () => {
         });
     };
 
-
     const handleSubmit = async () => {
         try {
             if (!token) {
                 alert('No token found, please log in again.');
                 return;
             }
-    
+
             const response = await fetch(variables.API_URL + 'daily-track', {
                 method: 'POST',
                 headers: {
@@ -199,159 +223,147 @@ const DailyTrack = () => {
                     tags: selectedTags
                 })
             });
-    
+
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error('Failed: ' + errorText);
             }
-    
+
             const data = await response.json();
             alert(data.message);
-            refreshMoods(token);
+            fetchSavedSelections(studentId, token);
         } catch (error) {
             alert('Failed: ' + error.message);
         }
     };
-    
 
-    if (alreadyTracked) {
-        return (
-            <div className="max-w-7xl mx-auto mt-12 p-6 theme-primary-bg rounded-lg shadow-lg text-center">
-                <h3 className="text-3xl font-semibold mb-4 theme-primary-text">Daily Tracker</h3>
-                <h3 className="text-xl mb-2 theme-primary-text">Hi {studentName}</h3>
-                <p className="theme-secondary-text mb-2">Sorry, you have already tracked today, come back tomorrow!</p>
-                <p className="theme-secondary-text">For now, use the quick track feature on the dashboard!</p>
-            </div>
-        );
-    } else {
-        return (
-            <div className="max-w-7xl mx-auto mt-12 p-6 theme-primary-bg rounded-lg shadow-lg">
-                <h3 className="text-3xl font-semibold mb-6 text-center theme-primary-text">Daily Tracker</h3>
-                <h3 className="text-xl mb-4 text-center theme-primary-text">Hi {studentName}</h3>
-                <form>
-                    <div className="form-group mb-6">
-                        <label className="block theme-primary-text text-lg mb-2">How did you feel overall today?</label>
-                        <div className="flex flex-wrap gap-2 justify-center">
-                            {moods.length === 0 ? (
-                                <p className="theme-secondary-text">Loading moods...</p>
-                            ) : (
-                                [...moods]
-                                    .sort((a, b) => a.mood_score - b.mood_score)  // Sort moods by mood_score
-                                    .map(mood => (
-                                        <button
-                                            key={mood.mood_id}
-                                            type="button"
-                                            className={`btn mood-button px-3 py-2 rounded transition ${selectedMood === mood.mood_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
-                                            onClick={() => handleMoodSelection(mood)}
-                                        >
-                                            {mood.mood_name}
-                                        </button>
-                                    ))
-                            )}
-                        </div>
+    return (
+        <div className="max-w-7xl mx-auto mt-4 p-6 theme-primary-bg rounded-lg">
+            <h3 className="text-3xl font-semibold mb-6 text-center theme-primary-text">Daily Tracker</h3>
+            <h3 className="text-xl mb-4 text-center theme-primary-text">Hi {studentName}</h3>
+            <form>
+                <div className="form-group mb-6">
+                    <label className="block theme-primary-text text-lg mb-2">How did you feel overall today?</label>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                        {moods.length === 0 ? (
+                            <p className="theme-secondary-text">Loading moods...</p>
+                        ) : (
+                            [...moods]
+                                .sort((a, b) => a.mood_score - b.mood_score)  // Sort moods by mood_score
+                                .map(mood => (
+                                    <button
+                                        key={mood.mood_id}
+                                        type="button"
+                                        className={`btn mood-button px-3 py-2 rounded transition ${selectedMood === mood.mood_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                        onClick={() => handleMoodSelection(mood)}
+                                    >
+                                        {mood.mood_name}
+                                    </button>
+                                ))
+                        )}
                     </div>
+                </div>
 
-                    <div className="form-group mb-6">
-                        <label className="block theme-primary-text text-lg mb-2">How many minutes of exercise did you complete today?</label>
-                        <div className="flex flex-wrap gap-2 justify-center">
-                            {exercises.length === 0 ? (
-                                <p className="theme-secondary-text">Loading exercises...</p>
-                            ) : (
-                                exercises.map(exercise => (
-                                    <button
-                                        key={exercise.exercise_id}
-                                        type="button"
-                                        className={`btn exercise-button px-3 py-2 rounded-lg transition ${selectedExercise === exercise.exercise_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
-                                        onClick={() => handleExerciseSelection(exercise)}
-                                    >
-                                        {exercise.exercise_name}
-                                    </button>
-                                ))
-                            )}
-                        </div>
-                    </div>
-                    <div className="form-group mb-6">
-                        <label className="block theme-primary-text text-lg mb-2">How do you rate last night's sleep?</label>
-                        <div className="flex flex-wrap gap-2 justify-center">
-                            {sleeps.length === 0 ? (
-                                <p className="theme-secondary-text">Loading sleeps...</p>
-                            ) : (
-                                sleeps.map(sleep => (
-                                    <button
-                                        key={sleep.sleep_id}
-                                        type="button"
-                                        className={`btn sleep-button px-3 py-2 rounded-lg transition ${selectedSleep === sleep.sleep_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
-                                        onClick={() => handleSleepSelection(sleep)}
-                                    >
-                                        {sleep.sleep_name}
-                                    </button>
-                                ))
-                            )}
-                        </div>
-                    </div>
-                    <div className="form-group mb-6">
-                        <label className="block theme-primary-text text-lg mb-2">How many minutes of a non-physical social activity did you complete today?</label>
-                        <div className="flex flex-wrap gap-2 justify-center">
-                            {socialisations.length === 0 ? (
-                                <p className="theme-secondary-text">Loading socialisations...</p>
-                            ) : (
-                                socialisations.map(socialisation => (
-                                    <button
-                                        key={socialisation.socialisation_id}
-                                        type="button"
-                                        className={`btn socialisation-button px-3 py-2 rounded-lg transition ${selectedSocialisation === socialisation.socialisation_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
-                                        onClick={() => handleSocialisationSelection(socialisation)}
-                                    >
-                                        {socialisation.socialisation_name}
-                                    </button>
-                                ))
-                            )}
-                        </div>
-                    </div>
-                    <div className="form-group mb-6">
-                        <label className="block theme-primary-text text-lg mb-2">Rate your productivity today (1-5):</label>
-                        <div className="flex gap-2 justify-center">
-                            {[1, 2, 3, 4, 5].map(value => (
+                <div className="form-group mb-6">
+                    <label className="block theme-primary-text text-lg mb-2">How many minutes of exercise did you complete today?</label>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                        {exercises.length === 0 ? (
+                            <p className="theme-secondary-text">Loading exercises...</p>
+                        ) : (
+                            exercises.map(exercise => (
                                 <button
-                                    key={value}
+                                    key={exercise.exercise_id}
                                     type="button"
-                                    className={`btn productivity-button px-3 py-2 rounded-lg transition ${selectedProductivity === value ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
-                                    onClick={() => handleProductivityChange(value)}
+                                    className={`btn exercise-button px-3 py-2 rounded-lg transition ${selectedExercise === exercise.exercise_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    onClick={() => handleExerciseSelection(exercise)}
                                 >
-                                    {value}
+                                    {exercise.exercise_name}
                                 </button>
-                            ))}
-                        </div>
+                            ))
+                        )}
                     </div>
-                    <div className="form-group mb-6">
-                        <label className="block theme-primary-text text-lg mb-2">Tags:</label>
-                        <div className="flex flex-wrap gap-2 justify-center">
-                            {tags.length === 0 ? (
-                                <p className="theme-secondary-text">Loading tags...</p>
-                            ) : (
-                                tags.map(tag => (
-                                    <button
-                                        key={tag.tag_id}
-                                        type="button"
-                                        className={`btn tag-button px-3 py-2 rounded-lg transition ${selectedTags.includes(tag.tag_id) ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
-                                        onClick={() => handleTagSelection(tag)}
-                                    >
-                                        {tag.tag_name}
-                                    </button>
-                                ))
-                            )}
-                        </div>
+                </div>
+                <div className="form-group mb-6">
+                    <label className="block theme-primary-text text-lg mb-2">How do you rate last night's sleep?</label>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                        {sleeps.length === 0 ? (
+                            <p className="theme-secondary-text">Loading sleeps...</p>
+                        ) : (
+                            sleeps.map(sleep => (
+                                <button
+                                    key={sleep.sleep_id}
+                                    type="button"
+                                    className={`btn sleep-button px-3 py-2 rounded-lg transition ${selectedSleep === sleep.sleep_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    onClick={() => handleSleepSelection(sleep)}
+                                >
+                                    {sleep.sleep_name}
+                                </button>
+                            ))
+                        )}
                     </div>
+                </div>
+                <div className="form-group mb-6">
+                    <label className="block theme-primary-text text-lg mb-2">How many minutes of a non-physical social activity did you complete today?</label>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                        {socialisations.length === 0 ? (
+                            <p className="theme-secondary-text">Loading socialisations...</p>
+                        ) : (
+                            socialisations.map(socialisation => (
+                                <button
+                                    key={socialisation.socialisation_id}
+                                    type="button"
+                                    className={`btn socialisation-button px-3 py-2 rounded-lg transition ${selectedSocialisation === socialisation.socialisation_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    onClick={() => handleSocialisationSelection(socialisation)}
+                                >
+                                    {socialisation.socialisation_name}
+                                </button>
+                            ))
+                        )}
+                    </div>
+                </div>
+                <div className="form-group mb-6">
+                    <label className="block theme-primary-text text-lg mb-2">Rate your productivity today (1-5):</label>
+                    <div className="flex gap-2 justify-center">
+                        {[1, 2, 3, 4, 5].map(value => (
+                            <button
+                                key={value}
+                                type="button"
+                                className={`btn productivity-button px-3 py-2 rounded-lg transition ${selectedProductivity === value ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                onClick={() => handleProductivityChange(value)}
+                            >
+                                {value}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                <div className="form-group mb-6">
+                    <label className="block theme-primary-text text-lg mb-2">Tags:</label>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                        {tags.length === 0 ? (
+                            <p className="theme-secondary-text">Loading tags...</p>
+                        ) : (
+                            tags.map(tag => (
+                                <button
+                                    key={tag.tag_id}
+                                    type="button"
+                                    className={`btn tag-button px-3 py-2 rounded-lg transition ${selectedTags.includes(tag.tag_id) ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    onClick={() => handleTagSelection(tag)}
+                                >
+                                    {tag.tag_name}
+                                </button>
+                            ))
+                        )}
+                    </div>
+                </div>
 
-                    <div className="form-group text-center">
-                        <button type="button" className="btn submit-button theme-button-bg theme-button-text px-6 py-2 rounded hover:opacity-80" onClick={handleSubmit}>
-                            Submit
-                        </button>
-                    </div>
-                </form>
-            </div>
-        );
-    }
+                <div className="form-group text-center">
+                    <button type="button" className="btn submit-button theme-button-bg theme-button-text w-100 mt-3 py-2 rounded hover:opacity-80" onClick={handleSubmit}>
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
 };
 
 export { DailyTrack };

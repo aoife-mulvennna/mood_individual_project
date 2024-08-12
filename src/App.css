@@ -4,7 +4,6 @@
 
 
 .top-bar {
-
   padding:20px; /* Horizontal padding */
 }
 
@@ -15,34 +14,12 @@
 }
 
 .nav-link {
-  color: white;
+  border-radius: 4px;
   text-decoration: none;
   font-size: 14px; /* Font size for smaller nav bar */
   padding: 5px; /* Padding for nav links */
   line-height: 1; /* Line height to reduce vertical spacing */
 }
-.nav-link:hover {
-  color: rgb(80, 80, 80);
-  background-color: #ddd;
-  border-radius: 4px;
-}
 
-.grey-button {
-  background-color: #ccc;
-  border: none;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 4px;
-  color: #000;
-}
 
-.active-link {
-  color: rgb(80, 80, 80);
-  background-color: #ddd;
-  border-radius: 4px;
-}
+

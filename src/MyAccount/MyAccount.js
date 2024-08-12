@@ -106,7 +106,7 @@ const MyAccount = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto mt-12 p-6 theme-bg-primary rounded-lg shadow-lg">
+    <div className="max-w-4xl mx-auto mt-4 p-6 theme-bg-primary rounded-lg">
       <h3 className="text-3xl font-semibold mb-6 text-center theme-text-primary">My Account</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
@@ -201,14 +201,14 @@ const MyAccount = () => {
             {passwordChangeError && <p className="text-red-500">{passwordChangeError}</p>}
             {passwordChangeSuccess && <p className="text-green-500">{passwordChangeSuccess}</p>}
             <div className="text-center">
-              <button type="submit" className="bg-button-bg text-button-text px-6 py-2 rounded-lg hover:opacity-80 transition">Change Password</button>
+              <button type="submit" className="bg-button-bg px-6 py-2 rounded-lg hover:opacity-80 transition theme-button-secondary theme-text-ternary">Change Password</button>
             </div>
           </form>
         </div>
       </div>
       <div className="mt-6">
         <label htmlFor="theme" className="block theme-text-primary">Theme</label>
-        <select id="theme" value={theme} onChange={(e) => setTheme(e.target.value)} className="w-full px-3 py-2 border rounded">
+        <select id="theme" value={theme} onChange={(e) => setTheme(e.target.value)} className="w-full px-3 py-2 border rounded theme-text-ternary">
           <option value="light">Light</option>
           <option value="dark">Dark</option>
           <option value="pink">Pink</option>

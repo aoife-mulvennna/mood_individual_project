@@ -33,7 +33,7 @@ const ForgotPassword = () => {
 
     return (
         <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+            <div className="bg-white p-8 rounded-lg max-w-md w-full">
                 <h3 className="text-2xl font-bold text-center mb-6">Forgot Password</h3>
                 {message && (
                     <div className="text-center mb-4">{message}</div>
@@ -46,7 +46,7 @@ const ForgotPassword = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         />
                     </div>
                     <div className="flex justify-center">

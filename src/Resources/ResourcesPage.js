@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { variables } from '../Variables';
-// import './Dashboard.css';
+import { jwtDecode } from 'jwt-decode'; // Import jwtDecode
 import '../themes.css';
 
 const ResourcesPage = () => {
     const [resources, setResources] = useState([]);
-    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+    const [recommendedResources, setRecommendedResources] = useState([]);
     const [expandedTopics, setExpandedTopics] = useState({});
-
-    useEffect(() => {
-        document.documentElement.setAttribute('data-theme', theme);
-    }, [theme]);
+    const [personalisedMessage, setPersonalisedMessage] = useState(''); // Initialize as a string
 
     useEffect(() => {
         fetchResources();
+        fetchRecommendedResources();
     }, []);
 
     const fetchResources = () => {
@@ -28,6 +26,31 @@ const ResourcesPage = () => {
                 setResources(data.resources);
             })
             .catch(error => console.error('Error fetching resources:', error));
+    };
+
+    const fetchRecommendedResources = () => {
+        const token = sessionStorage.getItem('token');
+        if (token) {
+            const decodedToken = jwtDecode(token);
+            fetch(`${variables.API_URL}personalised-resources/${decodedToken.id}`, {
+                headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.recommendedResources && data.recommendedResources.length > 0) {
+                        setRecommendedResources(data.recommendedResources);
+                        if (data.message) {
+                            setPersonalisedMessage(data.message);
+                        }
+                    } else {
+                        setRecommendedResources([]); // Clear recommendations if none found
+                        setPersonalisedMessage(''); // Clear the message if no recommendations
+                    }
+                })
+                .catch(error => console.error('Failed to fetch personalised resources', error));
+        }
     };
 
     const groupedResources = resources.reduce((acc, resource) => {
@@ -46,7 +69,32 @@ const ResourcesPage = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto mt-12 p-6 theme-primary-bg rounded-lg shadow-lg">
+        <div className="max-w-7xl mx-auto mt-4 p-6 theme-primary-bg rounded-lg">
+            {recommendedResources.length > 0 && (
+                <>
+                    <h3 className="text-center text-2xl font-semibold mb-6 theme-primary-text">Recommended Resources</h3>
+                    {personalisedMessage && (
+                        <div className="mb-6">
+                            <p className="text-md font-medium mb-4">
+                                {personalisedMessage}
+                            </p>
+                        </div>
+                    )}
+                    <div className="mb-6">
+                        <ul>
+                            {recommendedResources.map((resource, index) => (
+                                <li key={index} className="mb-6">
+                                    <a href={resource.resource_link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                                        {resource.resource_name}
+                                    </a>
+                                    <div className="text-sm text-gray-500">{resource.resource_topic_name}</div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </>
+            )}
+
             <h3 className="text-center text-2xl font-semibold mb-6 theme-primary-text">All Resources</h3>
             {Object.keys(groupedResources).map((topic, index) => (
                 <div key={index} className="mb-8">
@@ -66,9 +114,9 @@ const ResourcesPage = () => {
                         <ul className="list-none pl-0">
                             {groupedResources[topic].map((resource, index) => (
                                 <li key={index} className="mb-4">
-                                    <a href={resource.resource_link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline link">
+                                    <strong><a href={resource.resource_link} target="_blank" rel="noopener noreferrer" className="theme-secondary-text hover:underline link">
                                         {resource.resource_name}
-                                    </a>
+                                    </a></strong>
                                     <div className="text-sm theme-secondary-text">{new Date(resource.resource_added_date).toLocaleDateString()}</div>
                                 </li>
                             ))}

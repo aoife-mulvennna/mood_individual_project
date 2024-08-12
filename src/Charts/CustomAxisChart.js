@@ -222,7 +222,7 @@ const CustomAxisChart = ({ studentId }) => {
     };
 
     return (
-        <div className="bg-white p-6 rounded shadow-md flex flex-col lg:flex-row">
+        <div className="bg-white p-6 rounded flex flex-col lg:flex-row">
             <div className="flex-1" style={{ height: '500px' }}>
                 <Scatter data={chartData} options={options} />
             </div>

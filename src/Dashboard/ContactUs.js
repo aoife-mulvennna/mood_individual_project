@@ -91,7 +91,7 @@ const ContactUs = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto mt-12 p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-3xl mx-auto mt-12 p-6 bg-white rounded-lg">
       <h3 className="text-center text-2xl font-semibold mb-6 text-gray-800">Contact Us</h3>
       {success && (
         <div className="text-green-500 text-center mb-4">{success}</div>

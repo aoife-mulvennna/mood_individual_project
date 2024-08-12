@@ -72,12 +72,12 @@ const Main = () => {
                 >
                   My Records
                 </NavLink>
-                <NavLink
+                {/* <NavLink
                   className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
                   to="/info"
                 >
                   Info
-                </NavLink>
+                </NavLink> */}
                 <NavLink
                   className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
                   to="/my-account"
@@ -91,7 +91,7 @@ const Main = () => {
                   Resources
                 </NavLink>
 
-                <NavLink className="nav-link grey-button theme-button-bg theme-button-text" to="/logout">Sign out</NavLink>
+                <NavLink className="signout-button" to="/logout">Sign out</NavLink>
               </nav>
             </div>
 
@@ -131,13 +131,13 @@ const Main = () => {
               >
                 My Records
               </NavLink>
-              <NavLink
+              {/* <NavLink
                 className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
                 to="/info"
                 onClick={toggleSidebar}
               >
                 Info
-              </NavLink>
+              </NavLink> */}
               <NavLink
                 className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
                 to="/my-account"
@@ -153,7 +153,7 @@ const Main = () => {
                 Resources
               </NavLink>
 
-              <NavLink className="nav-link grey-button theme-button-bg theme-button-text " to="/logout" onClick={toggleSidebar}>Sign out</NavLink>
+              <NavLink className="nav-link signout-button theme-button-bg theme-button-text " to="/logout" onClick={toggleSidebar}>Sign out</NavLink>
             </nav>
           </div>
         </>

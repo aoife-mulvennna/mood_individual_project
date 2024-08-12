@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { variables } from '../Variables';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 import DateChart from '../Charts/DateChart';
 import CustomAxisChart from '../Charts/CustomAxisChart';
-import './MyRecord.css';
 
 const MyRecord = () => {
     const [dailyRecords, setDailyRecords] = useState([]);
     const [quickTrackerRecords, setQuickTrackerRecords] = useState([]);
-    const [recommendedResources, setRecommendedResources] = useState([]);
+    const [insights, setInsights] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [studentId, setStudentId] = useState(null);
@@ -20,7 +19,7 @@ const MyRecord = () => {
             setStudentId(decodedToken.id);
             fetchDailyRecords(decodedToken.id);
             fetchQuickTrackerRecords(decodedToken.id);
-            fetchRecommendedResources(decodedToken.id);
+            fetchStudentInsights(decodedToken.id);
         }
     }, []);
 
@@ -64,58 +63,55 @@ const MyRecord = () => {
         }
     };
 
-    const fetchRecommendedResources = async (studentId) => {
+    const fetchStudentInsights = async (studentId) => {
         try {
-            const response = await fetch(`${variables.API_URL}recommended-resources/${studentId}`, {
+            const response = await fetch(`${variables.API_URL}student-insights/${studentId}`, {
                 headers: {
                     'Authorization': `Bearer ${sessionStorage.getItem('token')}`
                 }
             });
             const data = await response.json();
             if (response.ok) {
-                setRecommendedResources(data.resources);
+                setInsights(data.insights);
             } else {
                 setError(data.message);
             }
         } catch (error) {
-            setError('Failed to fetch recommended resources');
+            setError('Failed to fetch student insights');
         }
     };
 
     if (loading) {
-        return <p className="theme-secondary-text">Loading records...</p>;
+        return <p className="text-center text-gray-600">Loading records...</p>;
     }
 
     if (error) {
-        return <p className="theme-accent-color">{error}</p>;
+        return <p className="text-center text-red-500">{error}</p>;
     }
 
     return (
-        <div className="max-w-7xl mx-auto mt-12 p-6 theme-primary-bg rounded-lg shadow-lg">
-            <h3 className="text-center text-2xl font-semibold mb-6 theme-primary-text">My Records</h3>
-            <div className="mb-6">
-                <h3 className="text-xl font-semibold mb-4 theme-primary-text">Chart with Different Components</h3>
-                <DateChart studentId={studentId} />
-            </div>
-            <div className="mb-6">
-                <h3 className="text-xl font-semibold mb-4 theme-primary-text">Chart with Any</h3>
-                <CustomAxisChart studentId={studentId} />
-            </div>
-            {recommendedResources.length > 0 && (
-                <div className="mb-6">
-                    <h3 className="text-xl font-semibold mb-4 theme-primary-text">Recommended Resources</h3>
-                    <ul>
-                        {recommendedResources.map((resource, index) => (
-                            <li key={index} className="mb-4">
-                                <a href={resource.resource_link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                                    {resource.resource_name}
-                                </a>
-                                <div className="text-sm text-gray-500">{resource.resource_topic_name}</div>
-                            </li>
+        <div className="max-w-7xl mx-auto mt-2 p-6 bg-white rounded-lg">
+            <h3 className="text-center text-3xl font-bold text-gray-800 mb-8">Personal Records Overview</h3>
+            
+            {insights.length > 0 && (
+                <div className="mb-8">
+                    <h4 className="text-2xl font-semibold text-gray-700 mb-4">Weekly Insights</h4>
+                    <ul className="list-disc pl-5 space-y-2">
+                        {insights.map((insight, index) => (
+                            <li key={index} className="text-gray-600">{insight}</li>
                         ))}
                     </ul>
                 </div>
             )}
+
+            <div className="mb-8">
+                <h3 className="text-2xl font-semibold text-gray-700 mb-4">Mood and Activity Trends</h3>
+                <DateChart studentId={studentId} />
+            </div>
+            <div className="mb-8">
+                <h3 className="text-2xl font-semibold text-gray-700 mb-4">Wellness Metrics Correlation</h3>
+                <CustomAxisChart studentId={studentId} />
+            </div>
         </div>
     );
 };
