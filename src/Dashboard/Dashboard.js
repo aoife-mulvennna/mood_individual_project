@@ -13,7 +13,6 @@ const Dashboard = () => {
     const [userName, setUserName] = useState('');
     const [studentId, setStudentId] = useState(null);
     const [assignments, setAssignments] = useState([]);
-    const [streak, setStreak] = useState(0);
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
     const navigate = useNavigate();
 
@@ -32,7 +31,6 @@ const Dashboard = () => {
                     fetchUserDetails(decodedToken.id);
                     setStudentId(decodedToken.id);
                     fetchAssignments(decodedToken.id);
-                    fetchStreak(decodedToken.id);
                 }
             } catch (error) {
                 console.error('Error decoding token:', error);
@@ -83,28 +81,6 @@ const Dashboard = () => {
             })
             .catch(error => {
                 console.error('Error fetching assignments:', error);
-            });
-    };
-
-    const fetchStreak = (userId) => {
-        fetch(`${variables.API_URL}streak/${userId}`, {
-            headers: {
-                'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error('Network response was not ok ' + response.statusText);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                setStreak(data.streakValue);
-            })
-            .catch(error => {
-                console.error('Error fetching streak:', error);
             });
     };
 
