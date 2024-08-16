@@ -18,7 +18,7 @@ const emojiMap = {
 
 const cooldownPeriodSeconds = 3600;
 
-const QuickTrack = () => {
+const QuickTrack = ({ onEntryComplete }) => {
     const [moods, setMoods] = useState([]);
     const [selectedMoodId, setSelectedMoodId] = useState('');
     const [token, setToken] = useState('');
@@ -26,32 +26,47 @@ const QuickTrack = () => {
 
     useEffect(() => {
         const storedToken = sessionStorage.getItem('token');
-        const storedCooldown = parseInt(localStorage.getItem('cooldownRemainingSeconds'), 10);
-        const lastUpdatedTime = parseInt(localStorage.getItem('lastUpdatedTime'), 10);
-
-        if (!isNaN(storedCooldown) && storedCooldown > 0) {
-            const currentTime = Math.floor(Date.now() / 1000);
-            const newCooldownRemainingSeconds = Math.max(storedCooldown - (currentTime - lastUpdatedTime), 0);
-            setCooldownRemainingSeconds(newCooldownRemainingSeconds);
+        const userId = sessionStorage.getItem('userId'); // Retrieve student ID
+        console.log('Component mounted, calling refreshMoods using userId:', userId, 'and for token:', token);
+        if (storedToken && userId) {
+            console.log('Token and userId found, setting token and calling checkCooldown');
+            setToken(storedToken);
+            checkCooldown(userId);
+        } else {
+            console.error('Token or userId not found');
         }
 
-        if (storedToken) {
-            try {
-                setToken(storedToken);
-                refreshMoods();
-            } catch (error) {
-                console.error('Error decoding token:', error);
-            }
-        }
+        refreshMoods();
     }, []);
+
+    const checkCooldown = async (userId) => {
+        try {
+            const response = await fetch(`${variables.API_URL}quick-track/cooldown/${userId}`, {
+                headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                }
+            });
+            const data = await response.json();
+
+            if (data.cooldownActive) {
+                setCooldownRemainingSeconds(data.remainingTimeSeconds);
+                localStorage.setItem(`cooldownRemainingSeconds_${userId}`, data.remainingTimeSeconds);
+                localStorage.setItem(`lastUpdatedTime_${userId}`, Math.floor(Date.now() / 1000));
+            }
+        } catch (error) {
+            console.error('Error checking cooldown:', error);
+        }
+    };
+
 
     useEffect(() => {
         if (cooldownRemainingSeconds > 0) {
+            const userId = sessionStorage.getItem('userId');
             const interval = setInterval(() => {
                 setCooldownRemainingSeconds(prevSeconds => {
                     const newSeconds = prevSeconds - 1;
-                    localStorage.setItem('cooldownRemainingSeconds', newSeconds);
-                    localStorage.setItem('lastUpdatedTime', Math.floor(Date.now() / 1000));
+                    localStorage.setItem(`cooldownRemainingSeconds_${userId}`, newSeconds);
+                    localStorage.setItem(`lastUpdatedTime_${userId}`, Math.floor(Date.now() / 1000));
                     if (newSeconds <= 0) {
                         clearInterval(interval);
                     }
@@ -63,14 +78,10 @@ const QuickTrack = () => {
         }
     }, [cooldownRemainingSeconds]);
 
-    useEffect(() => {
-        if (cooldownRemainingSeconds === 0) {
-            localStorage.removeItem('cooldownRemainingSeconds');
-            localStorage.removeItem('lastUpdatedTime');
-        }
-    }, [cooldownRemainingSeconds]);
-
     const refreshMoods = () => {
+        console.log('Fetching moods...');
+        console.log('API URL:', variables.API_URL);  // Add this log to verify the API URL
+
         fetch(`${variables.API_URL}mood`)
             .then(response => {
                 if (!response.ok) {
@@ -79,55 +90,75 @@ const QuickTrack = () => {
                 return response.json();
             })
             .then(data => {
-                const sortedMoods = data.sort((a, b) => a.mood_score - b.mood_score);
-                setMoods(sortedMoods);
+                console.log('Moods data:', data);
+                if (data.length === 0) {
+                    console.warn('No moods returned by the API.');
+                } else {
+                    const sortedMoods = data.sort((a, b) => a.mood_score - b.mood_score);
+                    setMoods(sortedMoods);
+                }
             })
             .catch(error => {
                 console.error('Error fetching moods:', error);
             });
+
     };
 
     const handleMoodSelection = (mood) => {
         setSelectedMoodId(mood.mood_id);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        const userId = sessionStorage.getItem('userId');
+
         if (!token) {
             alert('No token found, please log in again.');
             return;
         }
-        fetch(`${variables.API_URL}quick-track`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                mood_id: selectedMoodId
-            })
-        })
-            .then(async res => {
-                if (res.status === 409) {
-                    const { remainingTimeSeconds } = await res.json();
-                    setCooldownRemainingSeconds(remainingTimeSeconds);
-                    localStorage.setItem('cooldownRemainingSeconds', remainingTimeSeconds);
-                    localStorage.setItem('lastUpdatedTime', Math.floor(Date.now() / 1000));
-                    return;
-                }
-                if (!res.ok) {
-                    const errorText = await res.text();
-                    throw new Error(errorText);
-                }
-                const data = await res.json();
-                alert(data.message);
-                setCooldownRemainingSeconds(cooldownPeriodSeconds);
-                refreshMoods();
-            })
-            .catch(error => {
-                alert('Failed: ' + error.message);
-                console.error('Error:', error.message);
+
+        try {
+            const res = await fetch(`${variables.API_URL}quick-track`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    mood_id: selectedMoodId,
+                    student_id: userId
+                })
             });
+
+            if (res.status === 409) {
+                const { remainingTimeSeconds } = await res.json();
+                setCooldownRemainingSeconds(remainingTimeSeconds);
+                localStorage.setItem(`cooldownRemainingSeconds_${userId}`, remainingTimeSeconds);
+                localStorage.setItem(`lastUpdatedTime_${userId}`, Math.floor(Date.now() / 1000));
+                return;
+            }
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText);
+            }
+
+            const data = await res.json();
+            alert(data.message);
+            setCooldownRemainingSeconds(cooldownPeriodSeconds);
+            localStorage.setItem(`cooldownRemainingSeconds_${userId}`, cooldownPeriodSeconds);
+            localStorage.setItem(`lastUpdatedTime_${userId}`, Math.floor(Date.now() / 1000));
+            refreshMoods();
+
+                // Trigger stats refresh
+                if (onEntryComplete) {
+                    onEntryComplete();
+                }
+                
+        } catch (error) {
+            alert('Failed: ' + error.message);
+            console.error('Error:', error.message);
+        }
     };
 
     const formatTime = (seconds) => {
