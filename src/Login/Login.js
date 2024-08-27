@@ -6,10 +6,11 @@ import './Login.css';
 
 const Login = () => {
   const { login } = useAuth();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [studentNumber, setStudentNumber] = useState('');
   const [studentPassword, setStudentPassword] = useState('');
   const [visiblePassword, setVisiblePassword] = useState(false); // State to manage password visibility
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -22,7 +23,7 @@ const Login = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({studentNumber, studentPassword }),
+        body: JSON.stringify({ studentNumber, studentPassword }),
       });
       const data = await response.json();
       if (response.ok) {
@@ -32,11 +33,13 @@ const Login = () => {
         navigate('/dashboard');
       } else {
         console.log('Login failed:', data.message);
-        alert(`Login failed: ${data.message}`);
+        // alert(`Login failed: ${data.message}`);
+        setErrorMessage('Incorrect student number or password. Please try again.'); // Set the error message
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('An error occurred while logging in');
+      // alert('An error occurred while logging in');
+      setErrorMessage('An error occurred while logging in. Please try again later.'); // Set a generic error message
     }
   };
 
@@ -47,26 +50,37 @@ const Login = () => {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg max-w-md w-full">
-        <h3 className="text-2xl font-bold text-center mb-6">Please Log In</h3>
+        <h3 className="text-2xl font-bold text-center mb-6 text-black">Please Log In</h3>
+        {errorMessage && (
+          <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-center">
+            {errorMessage}
+          </div>
+        )}
         <form className="space-y-4" onSubmit={handleLogin}>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Student Number</label>
+            <label className="block text-sm font-medium text-gray-800">Student Number</label>
             <input
-              type="number"
+              type="text"
               value={studentNumber}
-              onChange={(e) => setStudentNumber(e.target.value)}
+              onChange={(e) => {
+                // Ensure only digits are allowed
+                const value = e.target.value;
+                if (/^\d*$/.test(value)) {
+                  setStudentNumber(value);
+                }
+              }}
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+              className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
             />
           </div>
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label className="block text-sm font-medium text-gray-800">Password</label>
             <input
               type={visiblePassword ? "text" : "password"}
               value={studentPassword}
               onChange={(e) => setStudentPassword(e.target.value)}
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+              className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
             />
             <span
               onClick={togglePasswordVisibility}

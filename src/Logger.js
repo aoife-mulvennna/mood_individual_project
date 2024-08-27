@@ -46,11 +46,11 @@ export class Logger extends Component {
         })
             .then(res => res.json())
             .then((result) => {
-                alert(result);
+                // alert(result);
                 this.refreshList()
             })
             .catch((error) => {
-                alert('Failed');
+                // alert('Failed');
                 console.error('Error:', error);
             });
 

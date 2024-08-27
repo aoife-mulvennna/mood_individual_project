@@ -47,8 +47,8 @@ const MoodScoreChart = ({ studentId }) => {
                 setMoodScores(data.moodScores);
 
                 if (data.moodScores.length > 0) {
-                    const startDate = data.moodScores[0].daily_record_timestamp;
-                    const endDate = data.moodScores[data.moodScores.length - 1].daily_record_timestamp;
+                    const startDate = data.moodScores[0].record_timestamp;
+                    const endDate = data.moodScores[data.moodScores.length - 1].record_timestamp;
                     setDateRange(generateDateRange(startDate, endDate));
                 }
             })
@@ -61,7 +61,7 @@ const MoodScoreChart = ({ studentId }) => {
     }, {});
 
     const dataPoints = moodScores.map(record => ({
-        x: new Date(record.daily_record_timestamp),
+        x: new Date(record.record_timestamp),
         y: record.mood_score,
     }));
 

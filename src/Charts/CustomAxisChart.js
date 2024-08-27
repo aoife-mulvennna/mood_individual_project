@@ -76,12 +76,16 @@ const CustomAxisChart = ({ studentId }) => {
 
     useEffect(() => {
         if (studentId) {
-            fetchData(studentId, 'mood-scores').then(data => setMoodScores(data.moodScores));
+            fetchData(studentId, 'mood-scores').then(data => {
+                console.log('Fetched Mood Scores:', data);  // Log the entire response to inspect its structure
+                setMoodScores(data.moodScores);
+            });
             fetchData(studentId, 'exercise-time').then(data => setExerciseDurations(data.exerciseTime));
             fetchData(studentId, 'sleep-rating').then(data => setSleepDurations(data.sleepRating));
             fetchData(studentId, 'socialisation').then(data => setSocialisationScores(data.socialisationScores));
             fetchData(studentId, 'productivity-scores').then(data => setProductivityScores(data.productivityScores));
             fetchMoods().then(data => {
+                console.log('Fetched Moods for Mapping:', data);  // Log the entire response to inspect its structure
                 const moodMap = {};
                 data.forEach(mood => {
                     moodMap[mood.mood_score] = mood.mood_name;
@@ -111,37 +115,50 @@ const CustomAxisChart = ({ studentId }) => {
             });
         }
     }, [studentId]);
+    
 
     const getDataPoints = () => {
         const dataPoints = [];
-
+    
         const allDates = [...new Set([
-            ...moodScores.map(record => record.daily_record_timestamp),
+            ...moodScores.map(record => record.record_timestamp),
             ...exerciseDurations.map(record => record.daily_record_timestamp),
             ...sleepDurations.map(record => record.daily_record_timestamp),
             ...socialisationScores.map(record => record.daily_record_timestamp),
             ...productivityScores.map(record => record.daily_record_timestamp)
         ])];
-
+    
         allDates.forEach(date => {
-            const mood = moodScores.find(record => record.daily_record_timestamp === date)?.mood_score;
+            const mood = moodScores.find(record => record.record_timestamp === date)?.mood_score;
             const exercise = exerciseDurations.find(record => record.daily_record_timestamp === date)?.exercise_score;
             const sleep = sleepDurations.find(record => record.daily_record_timestamp === date)?.sleep_id;
             const socialisation = socialisationScores.find(record => record.daily_record_timestamp === date)?.socialisation_score;
             const productivity = productivityScores.find(record => record.daily_record_timestamp === date)?.productivity_score;
-
+    
+            // console.log(`Data Point - Date: ${date}, Mood: ${mood}, Exercise: ${exercise}, Sleep: ${sleep}, Socialisation: ${socialisation}, Productivity: ${productivity}`);
+    
             const point = {
-                x: eval(xAxis),
-                y: eval(yAxis)
+                x: xAxis === 'mood' ? mood : 
+                   xAxis === 'exercise' ? exercise : 
+                   xAxis === 'sleep' ? sleep : 
+                   xAxis === 'socialisation' ? socialisation : productivity,
+                y: yAxis === 'mood' ? mood : 
+                   yAxis === 'exercise' ? exercise : 
+                   yAxis === 'sleep' ? sleep : 
+                   yAxis === 'socialisation' ? socialisation : productivity
             };
-
+    
             if (point.x !== undefined && point.y !== undefined) {
+                console.log(`Adding Data Point: X=${point.x}, Y=${point.y}`);
                 dataPoints.push(point);
+            } else {
+                console.log(`Skipping Data Point: X=${point.x}, Y=${point.y}`);
             }
         });
-
+    
         return dataPoints;
     };
+    
 
     const getAxisOptions = (axis, nameMap) => ({
         type: 'linear',
@@ -222,13 +239,13 @@ const CustomAxisChart = ({ studentId }) => {
     };
 
     return (
-        <div className="bg-white p-6 rounded flex flex-col lg:flex-row">
-            <div className="flex-1" style={{ height: '500px' }}>
+        <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col lg:flex-row">
+                   <div className="flex-grow" style={{ height: '500px' }}>
                 <Scatter data={chartData} options={options} />
             </div>
             <div className="flex flex-col items-start lg:items-center lg:justify-center space-y-2 mt-4 lg:mt-0 lg:ml-4">
                 <div>
-                    <label className="mr-2">X-Axis:</label>
+                    <label className="mr-2 text-gray-700">X-Axis:</label>
                     <select value={xAxis} onChange={(e) => setXAxis(e.target.value)} className="form-select">
                         <option value="mood">Mood</option>
                         <option value="exercise">Exercise</option>
@@ -238,7 +255,7 @@ const CustomAxisChart = ({ studentId }) => {
                     </select>
                 </div>
                 <div>
-                    <label className="mr-2">Y-Axis:</label>
+                    <label className="mr-2 text-gray-700">Y-Axis:</label>
                     <select value={yAxis} onChange={(e) => setYAxis(e.target.value)} className="form-select">
                         <option value="mood">Mood</option>
                         <option value="exercise">Exercise</option>

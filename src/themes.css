@@ -8,13 +8,18 @@
   --theme-button-text: white;
   --theme-topbar-bg: #f1f1f1;
   --theme-accent-color: #df2626;
-  --theme-active-link:#df2626;
-  --theme-button-secondary: #df2626
-  --theme-text-ternary: white;
-  --theme-hover-text: #df2626; 
+  --theme-active-link: #df2626;
+  --theme-button-secondary: #df2626;
+   --theme-text-ternary: rgb(0, 0, 0);
+  --theme-hover-text: #df2626;
   --theme-hover-bg: white;
   --theme-hover-signout-bg: rgb(170, 170, 170);
-  --theme-signout-bg:#df2626
+  --theme-signout-bg: #df2626;
+  --theme-border: #b3acac;
+  --theme-nav-bg:#d2d2d2;
+  --theme-nav-txt: rgb(0, 0, 0);
+  --theme-active-txt:#000000;
+  --theme-active-bg: #6f2727;
 }
 
 [data-theme="dark"] {
@@ -22,16 +27,21 @@
   --theme-primary-text: #eae8e8;
   --theme-secondary-bg: #3a3a3a;
   --theme-secondary-text: #fffcfc;
-  --theme-button-bg:  #df2626;
+  --theme-button-bg: #df2626;
   --theme-button-text: white;
   --theme-topbar-bg: #1f1f1f;
   --theme-accent-color: #df2626;
-  --theme-active-link:#444444;
-  --theme-text-ternary:black;
-  --theme-button-secondary:#bbbbbb;
-  --theme-hover-text:  white;
+  --theme-active-link:  #bbbbbb;
+  --theme-text-ternary: black;
+  --theme-button-secondary: #bbbbbb;
+  --theme-hover-text: white;
   --theme-hover-bg: #df2626;
   --theme-hover-signout-bg: #9e1d1d;
+  --theme-border: #1f1f1f;
+  --theme-nav-bg:#444444;
+  --theme-nav-txt: white;
+  --theme-active-txt:#444444;
+  --theme-active-bg: #b9b3b3;
 }
 
 [data-theme="pink"] {
@@ -42,13 +52,18 @@
   --theme-button-bg: #ff69b4;
   --theme-button-text: white;
   --theme-topbar-bg: #ffccd5;
-  --theme-accent-color:#ff69b4;
-  --theme-active-link:#ff69b4;
+  --theme-accent-color: #ff69b4;
+  --theme-active-link: #ff69b4;
   --theme-button-secondary: #ff69b4;
-  --theme-text-ternary: white;
-  --theme-hover-text:  #ff69b4;
-  --theme-hover-bg: white;
-  --theme-hover-signout-bg: rgb(170, 170, 170);
+  --theme-text-ternary: black;
+  --theme-hover-text: #ff69b4;
+  --theme-hover-bg: #ffb6c1;
+  --theme-hover-signout-bg: #ffb6c1;
+  --theme-border: #d07885;
+  --theme-nav-bg:#ffb6c1;
+  --theme-nav-txt: rgb(0, 0, 0);
+  --theme-active-txt:#444444;
+  --theme-active-bg: #ffffff;
 }
 
 body {
@@ -61,8 +76,8 @@ body {
 }
 
 .theme-primary-text {
-    color: var(--theme-primary-text) !important;
-  }
+  color: var(--theme-primary-text) !important;
+}
 
 .theme-secondary-bg {
   background-color: var(--theme-secondary-bg);
@@ -89,35 +104,72 @@ body {
 }
 
 .theme-active-link {
- background-color: var(--theme-active-link) !important;
+  background-color: var(--theme-active-link) !important;
 }
 
 .theme-text-ternary {
-  color:var(--theme-text-ternary);
+  color: var(--theme-text-ternary);
 }
-.theme-button-secondary{
+
+.theme-button-secondary {
   background-color: var(--theme-button-secondary);
 }
+
 button:hover {
   opacity: 0.8;
 }
 
+.theme-nav-bg {
+  background-color: var(--theme-nav-bg);
+  color: var(--theme-nav-txt);
+}
+
+.theme-active-txt {
+  color:var(--theme-active-txt);
+}
+.theme-active-bg{
+  color:var(--theme-active-bg);
+}
+
+.nav-link {
+  color: var(--theme-nav-txt);
+  text-decoration: none;
+}
+
 .nav-link.active-link {
-  color: var(--theme-accent-color);
+  background-color: var(--theme-active-bg);
+  color: var(--theme-active-txt); /* Ensure this color is not blue */
+}
+
+.nav-link:visited {
+  color: var(--theme-nav-txt); /* Use the same color as the normal text */
 }
 
 .nav-link:hover {
-  color: var(--theme-hover-text); /* Use hover text color variable */
+  color: var(--theme-hover-text);
   background-color: var(--theme-hover-bg);
 }
 
-.signout-button:hover {
-  font-weight: bold;
-  background-color: var(--theme-hover-signout-bg);
+.nav-link:active {
+  color: var(--theme-active-txt);
+}
+
+
+button.submit-button.theme-button-bg.theme-button-text {
+  background-color: var(--theme-button-bg);
+  color: var(--theme-button-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button.submit-button.theme-button-bg.theme-button-text:hover {
+  background-color: var(--theme-hover-bg);
+  color: var(--theme-hover-text);
+  opacity: 0.8;
 }
 
 .signout-button {
-  background-color: var(--theme-signout-bg);
+  background-color: var(--theme-button-bg);
+  color: var(--theme-button-text);
   border: none;
   padding: 10px 20px;
   text-align: center;
@@ -127,5 +179,17 @@ button:hover {
   margin: 4px 2px;
   cursor: pointer;
   border-radius: 4px;
-  transition: background-color 0.3s ease, font-weight 0.3s ease; /* Smooth transition */
+  transition: background-color 0.3s ease, font-weight 0.3s ease;
+  /* Smooth transition */
+}
+
+.signout-button:hover {
+  background-color: var(--theme-hover-signout-bg);
+  /* Pink-themed hover color */
+  color: var(--theme-button-text);
+}
+
+.theme-border {
+  border-color: var(--theme-border) !important;
+
 }

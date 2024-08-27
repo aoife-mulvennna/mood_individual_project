@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext();
@@ -6,13 +7,19 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (token) {
-      const decoded = jwtDecode(token);
-      setUser(decoded);
-      if (isTokenExpired(decoded)) {
-        logout();
+      try {
+        const decoded = jwtDecode(token);
+        setUser(decoded);
+        if (isTokenExpired(decoded)) {
+          handleSessionExpired();
+        }
+      } catch (error) {
+        console.error('Invalid token:', error);
+        handleSessionExpired();
       }
     } else {
       setUser(null);
@@ -21,6 +28,10 @@ export const AuthProvider = ({ children }) => {
 
   const isTokenExpired = (decodedToken) => {
     return decodedToken.exp * 1000 < Date.now();
+  };
+  const handleSessionExpired = () => {
+    logout();
+    navigate('/'); // Redirect to the landing page when the session expires
   };
 
   const login = (newToken) => {
@@ -31,6 +42,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setToken(null);
     localStorage.removeItem('token');
+    setUser(null); // Reset the user state
   };
 
   return (

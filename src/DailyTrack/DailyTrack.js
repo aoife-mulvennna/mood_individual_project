@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { variables } from '../Variables.js';
 import { jwtDecode } from 'jwt-decode';
-import "./DailyTrack.css";
 
 const DailyTrack = () => {
     const [moods, setMoods] = useState([]);
@@ -20,6 +19,8 @@ const DailyTrack = () => {
     const [studentName, setStudentName] = useState('');
     const [studentId, setStudentId] = useState('');
     const [token, setToken] = useState('');
+
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         const storedToken = sessionStorage.getItem('token');
@@ -44,7 +45,6 @@ const DailyTrack = () => {
                 }
             });
 
-            if (!response.ok) {
                 if (response.status === 404) {
                     // No record found for today, reset selections to defaults
                     console.log('No daily record found for today.');
@@ -56,10 +56,9 @@ const DailyTrack = () => {
                     setSelectedProductivity('');
                     setSelectedTags([]);
                     return;
-                } else {
+                } else if (!response.ok) {
                     throw new Error('Failed to fetch saved selections');
                 }
-            }
 
             const data = await response.json();
 
@@ -71,7 +70,9 @@ const DailyTrack = () => {
             setSelectedTags(data.tags);
 
         } catch (error) {
-            console.error('Error fetching saved selections:', error);
+            if (error.message !== 'Failed to fetch saved selections') {
+                console.error('Error fetching saved selections:', error);
+            }
         }
     };
 
@@ -200,9 +201,20 @@ const DailyTrack = () => {
     };
 
     const handleSubmit = async () => {
+        if (
+            !selectedMood ||
+            !selectedExercise ||
+            !selectedSleep ||
+            !selectedSocialisation ||
+            !selectedProductivity
+        ) {
+            setErrorMessage('Please complete all required fields.');
+            return;
+        }
+
         try {
             if (!token) {
-                alert('No token found, please log in again.');
+                setErrorMessage('No token found, please log in again.');
                 return;
             }
 
@@ -224,27 +236,32 @@ const DailyTrack = () => {
                 })
             });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error('Failed: ' + errorText);
-            }
-
             const data = await response.json();
-            alert(data.message);
-            fetchSavedSelections(studentId, token);
+
+            if (response.ok) {
+                setErrorMessage(''); // Clear any existing error message
+                fetchSavedSelections(studentId, token);
+            } else {
+                // Check if the message is "Please complete all fields"
+                if (data.message === 'Please complete all fields') {
+                    setErrorMessage('Please complete all fields');
+                } else {
+                    setErrorMessage(data.message || 'An unknown error occurred');
+                }
+            }
         } catch (error) {
-            alert('Failed: ' + error.message);
+            setErrorMessage('An error occurred while submitting the form. Please try again later.');
         }
     };
 
     return (
-        <div className="max-w-7xl mx-auto mt-4 p-6 theme-primary-bg rounded-lg">
-            <h3 className="text-3xl font-semibold mb-6 text-center theme-primary-text">Daily Tracker</h3>
-            <h3 className="text-xl mb-4 text-center theme-primary-text">Hi {studentName}</h3>
+        <div className="max-w-7xl mx-auto mt-2 p-8 theme-primary-bg">
+            <h3 className="text-3xl font-semibold mb-8 text-center theme-primary-text">Daily Tracker</h3>
+            <h3 className="text-2xl font-semibold mb-8 theme-primary-text">Hey {studentName},</h3>
             <form>
-                <div className="form-group mb-6">
-                    <label className="block theme-primary-text text-lg mb-2">How did you feel overall today?</label>
-                    <div className="flex flex-wrap gap-2 justify-center">
+                <div className="form-group mb-8">
+                    <label className="block theme-primary-text text-lg mb-8 ml-32">How did you feel overall today?</label>
+                    <div className="flex flex-wrap gap-4 justify-center ">
                         {moods.length === 0 ? (
                             <p className="theme-secondary-text">Loading moods...</p>
                         ) : (
@@ -254,7 +271,7 @@ const DailyTrack = () => {
                                     <button
                                         key={mood.mood_id}
                                         type="button"
-                                        className={`btn mood-button px-3 py-2 rounded transition ${selectedMood === mood.mood_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                        className={`btn px-3 py-2 transition mb-4 ${selectedMood === mood.mood_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                         onClick={() => handleMoodSelection(mood)}
                                     >
                                         {mood.mood_name}
@@ -264,9 +281,9 @@ const DailyTrack = () => {
                     </div>
                 </div>
 
-                <div className="form-group mb-6">
-                    <label className="block theme-primary-text text-lg mb-2">How many minutes of exercise did you complete today?</label>
-                    <div className="flex flex-wrap gap-2 justify-center">
+                <div className="form-group mb-8">
+                    <label className="block theme-primary-text text-lg mb-8 ml-32">How many minutes of exercise did you complete today?</label>
+                    <div className="flex flex-wrap gap-4 justify-center">
                         {exercises.length === 0 ? (
                             <p className="theme-secondary-text">Loading exercises...</p>
                         ) : (
@@ -274,7 +291,7 @@ const DailyTrack = () => {
                                 <button
                                     key={exercise.exercise_id}
                                     type="button"
-                                    className={`btn exercise-button px-3 py-2 rounded-lg transition ${selectedExercise === exercise.exercise_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    className={`btn px-3 py-2 transition mb-4 ${selectedExercise === exercise.exercise_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                     onClick={() => handleExerciseSelection(exercise)}
                                 >
                                     {exercise.exercise_name}
@@ -283,9 +300,9 @@ const DailyTrack = () => {
                         )}
                     </div>
                 </div>
-                <div className="form-group mb-6">
-                    <label className="block theme-primary-text text-lg mb-2">How do you rate last night's sleep?</label>
-                    <div className="flex flex-wrap gap-2 justify-center">
+                <div className="form-group mb-8">
+                    <label className="block theme-primary-text text-lg mb-8 ml-32">How do you rate last night's sleep?</label>
+                    <div className="flex flex-wrap gap-4 justify-center">
                         {sleeps.length === 0 ? (
                             <p className="theme-secondary-text">Loading sleeps...</p>
                         ) : (
@@ -293,7 +310,7 @@ const DailyTrack = () => {
                                 <button
                                     key={sleep.sleep_id}
                                     type="button"
-                                    className={`btn sleep-button px-3 py-2 rounded-lg transition ${selectedSleep === sleep.sleep_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    className={`btn px-3 py-2 transition mb-4 ${selectedSleep === sleep.sleep_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                     onClick={() => handleSleepSelection(sleep)}
                                 >
                                     {sleep.sleep_name}
@@ -302,9 +319,9 @@ const DailyTrack = () => {
                         )}
                     </div>
                 </div>
-                <div className="form-group mb-6">
-                    <label className="block theme-primary-text text-lg mb-2">How many minutes of a non-physical social activity did you complete today?</label>
-                    <div className="flex flex-wrap gap-2 justify-center">
+                <div className="form-group mb-8">
+                    <label className="block theme-primary-text text-lg mb-8 ml-32">How many minutes of a non-physical social activity did you complete today?</label>
+                    <div className="flex flex-wrap gap-4 justify-center">
                         {socialisations.length === 0 ? (
                             <p className="theme-secondary-text">Loading socialisations...</p>
                         ) : (
@@ -312,7 +329,7 @@ const DailyTrack = () => {
                                 <button
                                     key={socialisation.socialisation_id}
                                     type="button"
-                                    className={`btn socialisation-button px-3 py-2 rounded-lg transition ${selectedSocialisation === socialisation.socialisation_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    className={`btn px-3 py-2 transition mb-4 ${selectedSocialisation === socialisation.socialisation_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                     onClick={() => handleSocialisationSelection(socialisation)}
                                 >
                                     {socialisation.socialisation_name}
@@ -321,14 +338,14 @@ const DailyTrack = () => {
                         )}
                     </div>
                 </div>
-                <div className="form-group mb-6">
-                    <label className="block theme-primary-text text-lg mb-2">Rate your productivity today (1-5):</label>
-                    <div className="flex gap-2 justify-center">
+                <div className="form-group mb-8">
+                    <label className="block theme-primary-text text-lg mb-8 ml-32">Rate your productivity today (1-5):</label>
+                    <div className="flex gap-4 justify-center">
                         {[1, 2, 3, 4, 5].map(value => (
                             <button
                                 key={value}
                                 type="button"
-                                className={`btn productivity-button px-3 py-2 rounded-lg transition ${selectedProductivity === value ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                className={`btn px-3 py-2 transition mb-4 ${selectedProductivity === value ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                 onClick={() => handleProductivityChange(value)}
                             >
                                 {value}
@@ -336,9 +353,9 @@ const DailyTrack = () => {
                         ))}
                     </div>
                 </div>
-                <div className="form-group mb-6">
-                    <label className="block theme-primary-text text-lg mb-2">Tags:</label>
-                    <div className="flex flex-wrap gap-2 justify-center">
+                <div className="form-group mb-8">
+                    <label className="block theme-primary-text text-lg mb-8 ml-32">Is there anything else you would like to track?</label>
+                    <div className="flex flex-wrap gap-4 justify-center max-w-4xl mx-auto">
                         {tags.length === 0 ? (
                             <p className="theme-secondary-text">Loading tags...</p>
                         ) : (
@@ -346,7 +363,7 @@ const DailyTrack = () => {
                                 <button
                                     key={tag.tag_id}
                                     type="button"
-                                    className={`btn tag-button px-3 py-2 rounded-lg transition ${selectedTags.includes(tag.tag_id) ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    className={`btn px-3 py-2 transition mb-2 ${selectedTags.includes(tag.tag_id) ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                     onClick={() => handleTagSelection(tag)}
                                 >
                                     {tag.tag_name}
@@ -356,8 +373,13 @@ const DailyTrack = () => {
                     </div>
                 </div>
 
+                {errorMessage && (
+                    <div className="bg-red-100 text-red-700 p-3 mb-4 text-center">
+                        {errorMessage}
+                    </div>
+                )}
                 <div className="form-group text-center">
-                    <button type="button" className="btn submit-button theme-button-bg theme-button-text w-100 mt-3 py-2 rounded hover:opacity-80" onClick={handleSubmit}>
+                    <button type="button" className="btn theme-button-bg theme-button-text w-100 mt-3 py-2 hover:opacity-80" onClick={handleSubmit}>
                         Save
                     </button>
                 </div>

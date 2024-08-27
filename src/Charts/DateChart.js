@@ -29,7 +29,13 @@ const generateDateRange = (startDate, endDate) => {
 const aggregateByDate = (data, key) => {
     const result = {};
     data.forEach(record => {
-        const date = new Date(record.daily_record_timestamp).toISOString().split('T')[0];
+        const timestamp = record.record_timestamp || record.daily_record_timestamp;  // Ensure using the correct field
+        if (!timestamp || isNaN(new Date(timestamp).getTime())) {
+            console.warn(`Invalid or missing timestamp encountered:`, record);
+            return;
+        }
+
+        const date = new Date(timestamp).toISOString().split('T')[0];
         if (!result[date]) {
             result[date] = { count: 0, total: 0 };
         }
@@ -41,6 +47,12 @@ const aggregateByDate = (data, key) => {
         x: new Date(date),
         y: result[date].total / result[date].count,
     }));
+};
+
+const calculateAverage = (data) => {
+    if (data.length === 0) return 0;
+    const sum = data.reduce((acc, point) => acc + point.y, 0);
+    return sum / data.length;
 };
 
 const fetchData = async (userId, endpoint) => {
@@ -109,7 +121,10 @@ const DateChart = ({ studentId }) => {
 
     useEffect(() => {
         if (studentId) {
-            fetchData(studentId, 'mood-scores').then(data => setMoodScores(aggregateByDate(data.moodScores, 'mood_score')));
+            fetchData(studentId, 'mood-scores').then(data => {
+                console.log('Fetched mood data:', data.moodScores); // Log the mood data
+                setMoodScores(aggregateByDate(data.moodScores, 'mood_score'));
+            });
             fetchData(studentId, 'exercise-time').then(data => setExerciseDurations(aggregateByDate(data.exerciseTime, 'exercise_score')));
             fetchData(studentId, 'sleep-rating').then(data => setSleepDurations(aggregateByDate(data.sleepRating, 'sleep_score')));
             fetchData(studentId, 'socialisation').then(data => setSocialisationScores(aggregateByDate(data.socialisationScores, 'socialisation_score')));
@@ -200,8 +215,8 @@ const DateChart = ({ studentId }) => {
             yAxisOptions.yMood = {
                 type: 'linear',
                 position: 'left',
-                min: 1,
-                max: 5,
+                min: 1, // Ensure min starts at 1 (adjust this as necessary)
+                max: 5, // Ensure max is at 5 (adjust this as necessary)
                 ticks: {
                     stepSize: 1,
                     callback: function (value) {
@@ -213,7 +228,7 @@ const DateChart = ({ studentId }) => {
                 title: {
                     display: true,
                     text: 'Mood'
-                }
+                },
             };
         }
 
@@ -288,7 +303,7 @@ const DateChart = ({ studentId }) => {
                 max: 5,
                 ticks: {
                     stepSize: 1,
-                        maxRotation: 38,
+                    maxRotation: 38,
                     minRotation: 38
                 },
                 title: {
@@ -309,6 +324,19 @@ const DateChart = ({ studentId }) => {
                 yAxisID: 'yMood',
                 borderColor: 'rgb(75, 192, 192)',
                 tension: 0.1,
+                pointRadius: 0,
+                pointHoverRadius: 0,
+            },
+            selectedMetrics.mood && {
+                label: 'Average Mood',
+                data: dataPoints.mood.map(point => ({ x: point.x, y: calculateAverage(dataPoints.mood) })),
+                yAxisID: 'yMood',
+                borderColor: 'rgb(75, 192, 192)',
+                borderDash: [6, 10],
+                borderWidth: 4,
+                tension: 0.1,
+                pointRadius: 0,
+                pointHoverRadius: 0,
             },
             selectedMetrics.exercise && {
                 label: 'Exercise',
@@ -316,6 +344,19 @@ const DateChart = ({ studentId }) => {
                 yAxisID: 'yExercise',
                 borderColor: 'rgb(255, 99, 132)',
                 tension: 0.1,
+                pointRadius: 0,
+                pointHoverRadius: 0,
+            },
+            selectedMetrics.exercise && {
+                label: 'Average Exercise',
+                data: dataPoints.exercise.map(point => ({ x: point.x, y: calculateAverage(dataPoints.exercise) })),
+                yAxisID: 'yExercise',
+                borderColor: 'rgb(255, 99, 132)',
+                borderDash: [6, 10],
+                borderWidth: 4,
+                tension: 0.1,
+                pointRadius: 0,
+                pointHoverRadius: 0,
             },
             selectedMetrics.sleep && {
                 label: 'Sleep',
@@ -323,6 +364,19 @@ const DateChart = ({ studentId }) => {
                 yAxisID: 'ySleep',
                 borderColor: 'rgb(54, 162, 235)',
                 tension: 0.1,
+                pointRadius: 0,
+                pointHoverRadius: 0,
+            },
+            selectedMetrics.sleep && {
+                label: 'Average Sleep',
+                data: dataPoints.sleep.map(point => ({ x: point.x, y: calculateAverage(dataPoints.sleep) })),
+                yAxisID: 'ySleep',
+                borderColor: 'rgb(54, 162, 235)',
+                borderDash: [6, 10],
+                borderWidth: 4,
+                tension: 0.1,
+                pointRadius: 0,
+                pointHoverRadius: 0,
             },
             selectedMetrics.socialisation && {
                 label: 'Socialisation',
@@ -330,6 +384,19 @@ const DateChart = ({ studentId }) => {
                 yAxisID: 'ySocialisation',
                 borderColor: 'rgb(255, 206, 86)',
                 tension: 0.1,
+                pointRadius: 0,
+                pointHoverRadius: 0,
+            },
+            selectedMetrics.socialisation && {
+                label: 'Average Socialisation',
+                data: dataPoints.socialisation.map(point => ({ x: point.x, y: calculateAverage(dataPoints.socialisation) })),
+                yAxisID: 'ySocialisation',
+                borderColor: 'rgb(255, 206, 86)',
+                borderDash: [6, 10],
+                borderWidth: 4,
+                tension: 0.1,
+                pointRadius: 0,
+                pointHoverRadius: 0,
             },
             selectedMetrics.productivity && {
                 label: 'Productivity',
@@ -337,6 +404,19 @@ const DateChart = ({ studentId }) => {
                 yAxisID: 'yProductivity',
                 borderColor: 'rgb(153, 102, 255)',
                 tension: 0.1,
+                pointRadius: 0,
+                pointHoverRadius: 0,
+            },
+            selectedMetrics.productivity && {
+                label: 'Average Productivity',
+                data: dataPoints.productivity.map(point => ({ x: point.x, y: calculateAverage(dataPoints.productivity) })),
+                yAxisID: 'yProductivity',
+                borderColor: 'rgb(153, 102, 255)',
+                borderDash: [6, 10],
+                tension: 0.1,
+                pointRadius: 0,
+                pointHoverRadius: 0,
+                borderWidth: 4,
             },
         ].filter(Boolean),
     };
@@ -347,10 +427,14 @@ const DateChart = ({ studentId }) => {
         plugins: {
             legend: {
                 position: 'top',
+                labels: {
+                    padding: 20, 
+                },
             },
-            title: {
-                display: true,
-                //text: 'Metrics Over Time',
+        },
+        layout: {
+            padding: {
+                top: 10,
             },
         },
         scales: {
@@ -364,8 +448,8 @@ const DateChart = ({ studentId }) => {
                 max: new Date(),
                 ticks: {
                     autoSkip: false,
-                    maxRotation: 45,
-                    minRotation: 45
+                    maxRotation: 40,
+                    minRotation: 40
                 }
             },
             ...getYAxisOptions(selectedMetrics, moodNameMap, exerciseNameMap, sleepNameMap, socialisationNameMap)
@@ -388,94 +472,95 @@ const DateChart = ({ studentId }) => {
             <div className="flex-grow" style={{ height: '500px' }}>
                 <Line data={chartData} options={options} />
             </div>
-            <div className="flex flex-col space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col space-y-2">
-                    <label className="flex items-center space-x-2">
+                    <label className="flex items-center space-x-2 text-gray-800">
                         <input
                             type="checkbox"
                             name="mood"
                             checked={selectedMetrics.mood}
                             onChange={handleMetricChange}
-                            className="form-checkbox h-4 w-4 text-blue-600"
+                            className="form-checkbox h-4 w-4"
                         />
                         <span>Mood</span>
                     </label>
-                    <label className="flex items-center space-x-2">
+                    <label className="flex items-center space-x-2 text-gray-800">
                         <input
                             type="checkbox"
                             name="exercise"
                             checked={selectedMetrics.exercise}
                             onChange={handleMetricChange}
-                            className="form-checkbox h-4 w-4 text-blue-600"
+                            className="form-checkbox h-4 w-4"
                         />
                         <span>Exercise</span>
                     </label>
-                    <label className="flex items-center space-x-2">
+                    <label className="flex items-center space-x-2 text-gray-800">
                         <input
                             type="checkbox"
                             name="sleep"
                             checked={selectedMetrics.sleep}
                             onChange={handleMetricChange}
-                            className="form-checkbox h-4 w-4 text-blue-600"
+                            className="form-checkbox h-4 w-4"
                         />
                         <span>Sleep</span>
                     </label>
-                    <label className="flex items-center space-x-2">
+                    <label className="flex items-center space-x-2 text-gray-800">
                         <input
                             type="checkbox"
                             name="socialisation"
                             checked={selectedMetrics.socialisation}
                             onChange={handleMetricChange}
-                            className="form-checkbox h-4 w-4 text-blue-600"
+                            className="form-checkbox h-4 w-4"
                         />
                         <span>Socialisation</span>
                     </label>
-                    <label className="flex items-center space-x-2">
+                    <label className="flex items-center space-x-2  text-gray-800">
                         <input
                             type="checkbox"
                             name="productivity"
                             checked={selectedMetrics.productivity}
                             onChange={handleMetricChange}
-                            className="form-checkbox h-4 w-4 text-blue-600"
+                            className="form-checkbox h-4 w-4"
                         />
                         <span>Productivity</span>
                     </label>
                 </div>
                 <div className="flex flex-col space-y-2">
-                    <label className="flex items-center space-x-2">
+                    <label className="flex items-center space-x-2 text-gray-800">
                         <input
                             type="radio"
                             name="dateRange"
                             value="7_days"
                             checked={selectedRange === '7_days'}
                             onChange={handleRangeChange}
-                            className="form-radio h-4 w-4 text-blue-600"
+                            className="form-radio h-4 w-4"
                         />
                         <span>Last 7 Days</span>
                     </label>
-                    <label className="flex items-center space-x-2">
+                    <label className="flex items-center space-x-2  text-gray-800">
                         <input
                             type="radio"
                             name="dateRange"
                             value="1_month"
                             checked={selectedRange === '1_month'}
                             onChange={handleRangeChange}
-                            className="form-radio h-4 w-4 text-blue-600"
+                            className="form-radio h-4 w-4"
                         />
                         <span>Last Month</span>
                     </label>
-                    <label className="flex items-center space-x-2">
+                    <label className="flex items-center space-x-2  text-gray-800">
                         <input
                             type="radio"
                             name="dateRange"
                             value="1_year"
                             checked={selectedRange === '1_year'}
                             onChange={handleRangeChange}
-                            className="form-radio h-4 w-4 text-blue-600"
+                            className="form-radio h-4 w-4"
                         />
                         <span>Last Year</span>
                     </label>
                 </div>
+
             </div>
         </div>
     );

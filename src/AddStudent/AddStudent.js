@@ -146,9 +146,10 @@ const AddStudentForm = () => {
     };
 
     return (
-        <div className="min-h-screen">
-            <div className="bg-white p-8 rounded-lg max-w-md w-full">
-                <h2 className="text-2xl font-bold text-center mb-6">Create New Account</h2>
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <div className="bg-white p-8 rounded-lg w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mt-4 mb-4">
+
+                <h2 className="text-2xl font-bold text-center mb-6 text-black">Create New Account</h2>
                 {successMessage && (
                     <div className="text-green-500 text-center mb-4">{successMessage}</div>
                 )}
@@ -161,20 +162,26 @@ const AddStudentForm = () => {
                             It looks like you already have an account.
                         </div>
                     )}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-800">
                             Student Number
                         </label>
                         <input
-                            type="number"
-                            value={studentNumber}
-                            onChange={(e) => setStudentNumber(e.target.value)}
-                            required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                          type="text"
+                          value={studentNumber}
+                          onChange={(e) => {
+                            // Ensure only digits are allowed
+                            const value = e.target.value;
+                            if (/^\d*$/.test(value)) {
+                              setStudentNumber(value);
+                            }
+                          }}
+                          required
+                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-800">
                             Student Name
                         </label>
                         <input
@@ -182,11 +189,11 @@ const AddStudentForm = () => {
                             value={studentName}
                             onChange={(e) => setStudentName(e.target.value)}
                             required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-800">
                             Date of Birth
                         </label>
                         <input
@@ -194,11 +201,11 @@ const AddStudentForm = () => {
                             value={dateOfBirth}
                             onChange={(e) => setDateOfBirth(e.target.value)}
                             required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-800">
                             Student Email
                         </label>
                         <input
@@ -206,18 +213,18 @@ const AddStudentForm = () => {
                             value={studentEmail}
                             onChange={(e) => setStudentEmail(e.target.value)}
                             required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                    <div class="relative mb-4">
+                        <label className="block text-sm font-medium text-gray-800">
                             Course Name
                         </label>
                         <select
+                            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 sm:text-sm rounded leading-tight focus:outline-none focus:border-red-500"
                             value={selectedCourseName}
                             onChange={(e) => setSelectedCourseName(e.target.value)}
                             required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         >
                             <option value="">Select Course Name</option>
                             {courseNames.map((course) => (
@@ -226,16 +233,22 @@ const AddStudentForm = () => {
                                 </option>
                             ))}
                         </select>
+                        {/* className="absolute right-5 bottom-2 cursor-pointer text-gray-500" */}
+                        <div class="pointer-events-none absolute right-5 bottom-1 cursor-pointer text-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                    <div className="relative mb-4">
+                        <label className="block text-sm font-medium text-gray-800">
                             Course Year
                         </label>
                         <select
                             value={selectedCourseYear}
                             onChange={(e) => setSelectedCourseYear(e.target.value)}
                             required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md  focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 sm:text-sm rounded leading-tight focus:outline-none focus:border-red-500"
                         >
                             <option value="">Select Course Year</option>
                             {courseYears.map((year) => (
@@ -244,17 +257,22 @@ const AddStudentForm = () => {
                                 </option>
                             ))}
                         </select>
+                        <div class="pointer-events-none absolute right-5 bottom-1 cursor-pointer text-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </div>
                     </div>
-                    <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700">
-                            Student Password
+                    <div className="relative mb-2">
+                        <label className="block text-sm font-medium text-gray-800">
+                            Password
                         </label>
                         <input
                             type={visiblePasswordField === 'studentPassword' ? "text" : "password"}
                             value={studentPassword}
                             onChange={handlePasswordChange}
                             required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md  focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md  focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         />
                         <span
                             onClick={() => togglePasswordVisibility('studentPassword')}
@@ -272,8 +290,8 @@ const AddStudentForm = () => {
                             )}
                         </span>
                     </div>
-                    <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700">
+                    <div className="relative mb-4">
+                        <label className="block text-sm font-medium text-gray-800">
                             Confirm Password
                         </label>
                         <input
@@ -281,7 +299,7 @@ const AddStudentForm = () => {
                             value={confirmPassword}
                             onChange={handleConfirmPasswordChange}
                             required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md  focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md  focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         />
                         <span
                             onClick={() => togglePasswordVisibility('confirmPassword')}
@@ -302,7 +320,7 @@ const AddStudentForm = () => {
                     {!passwordsMatch && (
                         <p className="text-red-500 text-center mt-2">Passwords do not match</p>
                     )}
-                    <div className="flex justify-center">
+                    <div className="flex justify-center mb-4">
                         <button
                             type="submit"
                             className="bg-red-500 text-white px-6 py-2 rounded-md font-semibold hover:bg-red-600 transition"

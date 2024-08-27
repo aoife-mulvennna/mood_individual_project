@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { variables } from '../Variables.js';
+import { useTheme } from '../ThemeContext';
 
 import Emoji1 from '../Photos/Emoji-1.png';
 import Emoji2 from '../Photos/Emoji-2.png';
@@ -23,6 +24,12 @@ const QuickTrack = ({ onEntryComplete }) => {
     const [selectedMoodId, setSelectedMoodId] = useState('');
     const [token, setToken] = useState('');
     const [cooldownRemainingSeconds, setCooldownRemainingSeconds] = useState(0);
+    const { theme } = useTheme(); // Use the theme context
+
+    useEffect(() => {
+        console.log('Current theme:', theme); // Log the current theme
+        document.documentElement.setAttribute('data-theme', theme);
+    }, [theme]);
 
     useEffect(() => {
         const storedToken = sessionStorage.getItem('token');
@@ -112,7 +119,7 @@ const QuickTrack = ({ onEntryComplete }) => {
         const userId = sessionStorage.getItem('userId');
 
         if (!token) {
-            alert('No token found, please log in again.');
+            // alert('No token found, please log in again.');
             return;
         }
 
@@ -144,17 +151,17 @@ const QuickTrack = ({ onEntryComplete }) => {
             }
 
             const data = await res.json();
-            alert(data.message);
+            // alert(data.message);
             setCooldownRemainingSeconds(cooldownPeriodSeconds);
             localStorage.setItem(`cooldownRemainingSeconds_${userId}`, cooldownPeriodSeconds);
             localStorage.setItem(`lastUpdatedTime_${userId}`, Math.floor(Date.now() / 1000));
             refreshMoods();
 
-                // Trigger stats refresh
-                if (onEntryComplete) {
-                    onEntryComplete();
-                }
-                
+            // Trigger stats refresh
+            if (onEntryComplete) {
+                onEntryComplete();
+            }
+
         } catch (error) {
             alert('Failed: ' + error.message);
             console.error('Error:', error.message);
@@ -188,12 +195,15 @@ const QuickTrack = ({ onEntryComplete }) => {
                 </div>
                 {cooldownRemainingSeconds > 0 ? (
                     <div>
-                        <p className="text-center theme-secondary-text">You can submit another entry in {formatTime(cooldownRemainingSeconds)}</p>
+                        <p className="text-center theme-primary-text">You can submit another entry in {formatTime(cooldownRemainingSeconds)}</p>
                     </div>
                 ) : (
-                    <button className="flex justify-center items-center tick-button mx-auto mt-4 theme-button-bg theme-button-text px-4 py-2 rounded hover:scale-110 transition-transform" onClick={handleSubmit}>
-                        <img src={Tick} className="tick" alt="Submit" />
+                    <div className="flex justify-center items-center">
+                     <button className="px-4 py-2 theme-button-bg theme-button-text mt-2" onClick={handleSubmit}>
+                        Submit
                     </button>
+                    </div>
+                
                 )}
             </div>
         </div>

@@ -84,8 +84,10 @@ const ResourcesPage = () => {
                         <ul>
                             {recommendedResources.map((resource, index) => (
                                 <li key={index} className="mb-6">
-                                    <a href={resource.resource_link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                                        {resource.resource_name}
+                                    <a href={resource.resource_link} target="_blank" rel="noopener noreferrer" className="theme-secondary-text hover:underline link">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5 inline-block align-middle">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+                                        </svg>   {resource.resource_name}
                                     </a>
                                     <div className="text-sm text-gray-500">{resource.resource_topic_name}</div>
                                 </li>
@@ -115,7 +117,9 @@ const ResourcesPage = () => {
                             {groupedResources[topic].map((resource, index) => (
                                 <li key={index} className="mb-4">
                                     <strong><a href={resource.resource_link} target="_blank" rel="noopener noreferrer" className="theme-secondary-text hover:underline link">
-                                        {resource.resource_name}
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5 inline-block align-middle">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+                                        </svg>  {resource.resource_name}
                                     </a></strong>
                                     <div className="text-sm theme-secondary-text">{new Date(resource.resource_added_date).toLocaleDateString()}</div>
                                 </li>

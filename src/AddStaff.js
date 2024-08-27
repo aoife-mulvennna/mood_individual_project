@@ -53,7 +53,7 @@ const AddStaff = () => {
       setErrorMessage('Failed to add staff');
       setSuccessMessage('');
       console.error('Error adding staff:', error.message);
-      // Display error message to user (e.g., toast, alert, or set state for error message in UI)
+      
     }
   };
 

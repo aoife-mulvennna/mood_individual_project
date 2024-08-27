@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
+import { useTheme } from '../ThemeContext'; 
 import { variables } from '../Variables.js';
 
 const MyAccount = () => {
@@ -13,13 +14,13 @@ const MyAccount = () => {
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState(null);
   const [visiblePasswordField, setVisiblePasswordField] = useState(null);
   const { user, token } = useAuth();
-
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  const { theme, toggleTheme } = useTheme(); 
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-  }, [theme]);
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  }, []);
+
 
   useEffect(() => {
     const fetchStudentDetails = async () => {
@@ -53,6 +54,10 @@ const MyAccount = () => {
     }
   }, [user, token]);
 
+  const handleThemeChange = (e) => {
+    toggleTheme(e.target.value);
+};
+
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
@@ -75,7 +80,12 @@ const MyAccount = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to change password');
+        const errorData = await response.json(); // Parse the error response
+        if (errorData.message === 'Incorrect current password. Try again.') {
+          throw new Error('Incorrect current password. Try again.');
+        } else {
+          throw new Error('Failed to change password');
+        }
       }
 
       setPasswordChangeSuccess('Password changed successfully');
@@ -85,7 +95,11 @@ const MyAccount = () => {
       setConfirmPassword('');
       setVisiblePasswordField(null);
     } catch (error) {
-      setPasswordChangeError('Failed to change password');
+      if (error.message === 'Incorrect current password. Try again.') {
+        setPasswordChangeError('Incorrect current password. Try again.');
+      } else {
+        setPasswordChangeError('Failed to change password');
+      }
       setPasswordChangeSuccess(null);
     }
   };
@@ -107,7 +121,7 @@ const MyAccount = () => {
 
   return (
     <div className="max-w-4xl mx-auto mt-4 p-6 theme-bg-primary rounded-lg">
-      <h3 className="text-3xl font-semibold mb-6 text-center theme-text-primary">My Account</h3>
+      <h3 className="text-3xl font-semibold mb-4 text-center theme-text-primary">My Account</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <h4 className="text-2xl font-semibold mb-4 theme-text-primary">Account Details</h4>
@@ -132,7 +146,7 @@ const MyAccount = () => {
               />
               <span
                 onClick={() => togglePasswordVisibility('currentPassword')}
-                className="absolute right-5 bottom-2 cursor-pointer theme-text-secondary"
+                className="absolute right-5 bottom-2 cursor-pointer theme-text-ternary"
               >
                 {visiblePasswordField === 'currentPassword' ? (
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -158,7 +172,7 @@ const MyAccount = () => {
               />
               <span
                 onClick={() => togglePasswordVisibility('newPassword')}
-                className="absolute right-5 bottom-2 cursor-pointer theme-text-secondary"
+                className="absolute right-5 bottom-2 cursor-pointer theme-text-ternary"
               >
                 {visiblePasswordField === 'newPassword' ? (
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -184,7 +198,7 @@ const MyAccount = () => {
               />
               <span
                 onClick={() => togglePasswordVisibility('confirmPassword')}
-                className="absolute right-5 bottom-2 cursor-pointer theme-text-secondary"
+                className="absolute right-5 bottom-2 cursor-pointer theme-text-ternary"
               >
                 {visiblePasswordField === 'confirmPassword' ? (
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -201,18 +215,24 @@ const MyAccount = () => {
             {passwordChangeError && <p className="text-red-500">{passwordChangeError}</p>}
             {passwordChangeSuccess && <p className="text-green-500">{passwordChangeSuccess}</p>}
             <div className="text-center">
-              <button type="submit" className="bg-button-bg px-6 py-2 rounded-lg hover:opacity-80 transition theme-button-secondary theme-text-ternary">Change Password</button>
+              <button type="submit" className="block appearance-none w-full theme-button-bg theme-text-ternary py-2 px-3 pr-8 sm:text-sm rounded leading-tight focus:outline-none focus:border-red-500">Change Password</button>
             </div>
           </form>
         </div>
       </div>
-      <div className="mt-6">
-        <label htmlFor="theme" className="block theme-text-primary">Theme</label>
-        <select id="theme" value={theme} onChange={(e) => setTheme(e.target.value)} className="w-full px-3 py-2 border rounded theme-text-ternary">
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-          <option value="pink">Pink</option>
-        </select>
+      <div className="mt-6 ">
+        <label htmlFor="theme" className="block theme-primary-text">Theme</label>
+        <select id="theme" value={theme} onChange={handleThemeChange} className="w-full px-3 py-2 border rounded theme-text-ternary">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                    <option value="pink">Pink</option>
+                </select>
+                <div class="pointer-events-none absolute right-5 bottom-1 cursor-pointer text-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </div>
+
       </div>
     </div>
   );
