@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
-import { useTheme } from '../ThemeContext'; 
+import { useTheme } from '../ThemeContext';
 import { variables } from '../Variables.js';
 
 const MyAccount = () => {
@@ -14,7 +14,7 @@ const MyAccount = () => {
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState(null);
   const [visiblePasswordField, setVisiblePasswordField] = useState(null);
   const { user, token } = useAuth();
-  const { theme, toggleTheme } = useTheme(); 
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'light';
@@ -56,7 +56,7 @@ const MyAccount = () => {
 
   const handleThemeChange = (e) => {
     toggleTheme(e.target.value);
-};
+  };
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
@@ -220,14 +220,14 @@ const MyAccount = () => {
           </form>
         </div>
       </div>
-      <div className="mt-6 ">
+      <div className="mt-6 relative">
         <label htmlFor="theme" className="block theme-primary-text">Theme</label>
-        <select id="theme" value={theme} onChange={handleThemeChange} className="w-full px-3 py-2 border rounded theme-text-ternary">
-                    <option value="light">Light</option>
-                    <option value="dark">Dark</option>
-                    <option value="pink">Pink</option>
-                </select>
-                <div class="pointer-events-none absolute right-5 bottom-1 cursor-pointer text-gray-700">
+        <select id="theme" value={theme} onChange={handleThemeChange} className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-1.5 px-3 pr-8 sm:text-sm rounded leading-tight focus:outline-none focus:border-red-500">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="pink">Pink</option>
+        </select>
+        <div class="pointer-events-none absolute right-5 bottom-1 cursor-pointer text-gray-700">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="w-6 h-6">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                             </svg>

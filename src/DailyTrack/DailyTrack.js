@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { variables } from '../Variables.js';
 import { jwtDecode } from 'jwt-decode';
-
+import './DailyTrack.css';
 const DailyTrack = () => {
     const [moods, setMoods] = useState([]);
     const [socialisations, setSocialisations] = useState([]);
@@ -21,6 +21,8 @@ const DailyTrack = () => {
     const [token, setToken] = useState('');
 
     const [errorMessage, setErrorMessage] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+    const [isFading, setIsFading] = useState(false);
 
     useEffect(() => {
         const storedToken = sessionStorage.getItem('token');
@@ -37,6 +39,23 @@ const DailyTrack = () => {
         }
     }, []);
 
+    useEffect(() => {
+        if (errorMessage || successMessage) {
+            const timer = setTimeout(() => {
+                setIsFading(true); // Start fade out
+
+                setTimeout(() => {
+                    setErrorMessage('');
+                    setSuccessMessage('');
+                    setIsFading(false); // Reset fading state
+                }, 500); // Match this time to the CSS transition duration (0.5s)
+
+            }, 14500); // Start fading after 14.5 seconds, then fade-out over 0.5 seconds (total 15s)
+
+            return () => clearTimeout(timer);
+        }
+    }, [errorMessage, successMessage]);
+    
     const fetchSavedSelections = async (id, token) => {
         try {
             const response = await fetch(variables.API_URL + `daily-track/${id}`, {
@@ -45,20 +64,20 @@ const DailyTrack = () => {
                 }
             });
 
-                if (response.status === 404) {
-                    // No record found for today, reset selections to defaults
-                    console.log('No daily record found for today.');
-                    // Ensure the form is in a state to accept new data
-                    setSelectedMood('');
-                    setSelectedExercise('');
-                    setSelectedSleep('');
-                    setSelectedSocialisation('');
-                    setSelectedProductivity('');
-                    setSelectedTags([]);
-                    return;
-                } else if (!response.ok) {
-                    throw new Error('Failed to fetch saved selections');
-                }
+            if (response.status === 404) {
+                // No record found for today, reset selections to defaults
+                console.log('No daily record found for today.');
+                // Ensure the form is in a state to accept new data
+                setSelectedMood('');
+                setSelectedExercise('');
+                setSelectedSleep('');
+                setSelectedSocialisation('');
+                setSelectedProductivity('');
+                setSelectedTags([]);
+                return;
+            } else if (!response.ok) {
+                throw new Error('Failed to fetch saved selections');
+            }
 
             const data = await response.json();
 
@@ -209,12 +228,14 @@ const DailyTrack = () => {
             !selectedProductivity
         ) {
             setErrorMessage('Please complete all required fields.');
+            setSuccessMessage('');
             return;
         }
 
         try {
             if (!token) {
                 setErrorMessage('No token found, please log in again.');
+                setSuccessMessage('');
                 return;
             }
 
@@ -237,11 +258,16 @@ const DailyTrack = () => {
             });
 
             const data = await response.json();
+            console.log("Response status:", response.status);
 
             if (response.ok) {
                 setErrorMessage(''); // Clear any existing error message
+                setSuccessMessage(data.message); // Set success message
                 fetchSavedSelections(studentId, token);
+
+                // setTimeout(() => setSuccessMessage(false), 5000);
             } else {
+                setSuccessMessage('');
                 // Check if the message is "Please complete all fields"
                 if (data.message === 'Please complete all fields') {
                     setErrorMessage('Please complete all fields');
@@ -250,7 +276,9 @@ const DailyTrack = () => {
                 }
             }
         } catch (error) {
+            console.error('An error occurred:', error);
             setErrorMessage('An error occurred while submitting the form. Please try again later.');
+            setSuccessMessage('');
         }
     };
 
@@ -271,7 +299,7 @@ const DailyTrack = () => {
                                     <button
                                         key={mood.mood_id}
                                         type="button"
-                                        className={`btn px-3 py-2 transition mb-4 ${selectedMood === mood.mood_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                        className={`btn px-3 py-2 transition mb-4 rounded-none ${selectedMood === mood.mood_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                         onClick={() => handleMoodSelection(mood)}
                                     >
                                         {mood.mood_name}
@@ -291,7 +319,7 @@ const DailyTrack = () => {
                                 <button
                                     key={exercise.exercise_id}
                                     type="button"
-                                    className={`btn px-3 py-2 transition mb-4 ${selectedExercise === exercise.exercise_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    className={`btn px-3 py-2 transition mb-4 rounded-none ${selectedExercise === exercise.exercise_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                     onClick={() => handleExerciseSelection(exercise)}
                                 >
                                     {exercise.exercise_name}
@@ -310,7 +338,7 @@ const DailyTrack = () => {
                                 <button
                                     key={sleep.sleep_id}
                                     type="button"
-                                    className={`btn px-3 py-2 transition mb-4 ${selectedSleep === sleep.sleep_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    className={`btn px-3 py-2 transition mb-4 rounded-none ${selectedSleep === sleep.sleep_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                     onClick={() => handleSleepSelection(sleep)}
                                 >
                                     {sleep.sleep_name}
@@ -329,7 +357,7 @@ const DailyTrack = () => {
                                 <button
                                     key={socialisation.socialisation_id}
                                     type="button"
-                                    className={`btn px-3 py-2 transition mb-4 ${selectedSocialisation === socialisation.socialisation_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    className={`btn px-3 py-2 transition mb-4 rounded-none ${selectedSocialisation === socialisation.socialisation_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                     onClick={() => handleSocialisationSelection(socialisation)}
                                 >
                                     {socialisation.socialisation_name}
@@ -345,7 +373,7 @@ const DailyTrack = () => {
                             <button
                                 key={value}
                                 type="button"
-                                className={`btn px-3 py-2 transition mb-4 ${selectedProductivity === value ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                className={`btn px-3 py-2 transition mb-4 rounded-none ${selectedProductivity === value ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                 onClick={() => handleProductivityChange(value)}
                             >
                                 {value}
@@ -363,7 +391,7 @@ const DailyTrack = () => {
                                 <button
                                     key={tag.tag_id}
                                     type="button"
-                                    className={`btn px-3 py-2 transition mb-2 ${selectedTags.includes(tag.tag_id) ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    className={`btn px-3 py-2 transition mb-2 rounded-none ${selectedTags.includes(tag.tag_id) ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                     onClick={() => handleTagSelection(tag)}
                                 >
                                     {tag.tag_name}
@@ -373,13 +401,19 @@ const DailyTrack = () => {
                     </div>
                 </div>
 
+                {successMessage && (
+                    <div className="bg-green-100 text-green-700 p-3 mb-4 text-center">
+                        {successMessage}
+                    </div>
+
+                )}
                 {errorMessage && (
                     <div className="bg-red-100 text-red-700 p-3 mb-4 text-center">
                         {errorMessage}
                     </div>
                 )}
                 <div className="form-group text-center">
-                    <button type="button" className="btn theme-button-bg theme-button-text w-100 mt-3 py-2 hover:opacity-80" onClick={handleSubmit}>
+                    <button type="button" className="btn theme-button-bg theme-button-text w-100 mt-3 py-2 hover:opacity-80 rounded-none" onClick={handleSubmit}>
                         Save
                     </button>
                 </div>

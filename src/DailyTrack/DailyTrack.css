@@ -1,0 +1,8 @@
+.message {
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out; /* Smooth fade-out over 0.5 seconds */
+}
+
+.message.fade-out {
+    opacity: 0;
+}

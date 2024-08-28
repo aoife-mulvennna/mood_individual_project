@@ -468,7 +468,7 @@ const DateChart = ({ studentId }) => {
     };
 
     return (
-        <div className="bg-white p-6 rounded flex flex-col lg:flex-row lg:space-x-6 lg:space-y-0 space-y-4">
+        <div className="bg-white p-6 flex flex-col lg:flex-row lg:space-x-6 lg:space-y-0 space-y-4">
             <div className="flex-grow" style={{ height: '500px' }}>
                 <Line data={chartData} options={options} />
             </div>

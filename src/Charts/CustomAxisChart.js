@@ -135,8 +135,6 @@ const CustomAxisChart = ({ studentId }) => {
             const socialisation = socialisationScores.find(record => record.daily_record_timestamp === date)?.socialisation_score;
             const productivity = productivityScores.find(record => record.daily_record_timestamp === date)?.productivity_score;
     
-            // console.log(`Data Point - Date: ${date}, Mood: ${mood}, Exercise: ${exercise}, Sleep: ${sleep}, Socialisation: ${socialisation}, Productivity: ${productivity}`);
-    
             const point = {
                 x: xAxis === 'mood' ? mood : 
                    xAxis === 'exercise' ? exercise : 
@@ -202,10 +200,6 @@ const CustomAxisChart = ({ studentId }) => {
             legend: {
                 position: 'top',
             },
-            title: {
-                // display: true,
-                // text: 'Custom Axis Chart',
-            },
         },
         scales: {
             x: xAxis === 'mood' ? getAxisOptions(xAxis, moodNameMap, 'bottom') :
@@ -238,8 +232,16 @@ const CustomAxisChart = ({ studentId }) => {
         },
     };
 
+    const axisOptions = [
+        { value: 'mood', label: 'Mood' },
+        { value: 'exercise', label: 'Exercise' },
+        { value: 'sleep', label: 'Sleep' },
+        { value: 'socialisation', label: 'Socialisation' },
+        { value: 'productivity', label: 'Productivity' },
+    ];
+
     return (
-        <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col lg:flex-row">
+        <div className="bg-white p-6 shadow-lg flex flex-col lg:flex-row">
                    <div className="flex-grow" style={{ height: '500px' }}>
                 <Scatter data={chartData} options={options} />
             </div>
@@ -247,21 +249,25 @@ const CustomAxisChart = ({ studentId }) => {
                 <div>
                     <label className="mr-2 text-gray-700">X-Axis:</label>
                     <select value={xAxis} onChange={(e) => setXAxis(e.target.value)} className="form-select">
-                        <option value="mood">Mood</option>
-                        <option value="exercise">Exercise</option>
-                        <option value="sleep">Sleep</option>
-                        <option value="socialisation">Socialisation</option>
-                        <option value="productivity">Productivity</option>
+                    {axisOptions
+                            .filter(option => option.value !== yAxis)
+                            .map(option => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
                     </select>
                 </div>
                 <div>
                     <label className="mr-2 text-gray-700">Y-Axis:</label>
                     <select value={yAxis} onChange={(e) => setYAxis(e.target.value)} className="form-select">
-                        <option value="mood">Mood</option>
-                        <option value="exercise">Exercise</option>
-                        <option value="sleep">Sleep</option>
-                        <option value="socialisation">Socialisation</option>
-                        <option value="productivity">Productivity</option>
+                         {axisOptions
+                            .filter(option => option.value !== xAxis)
+                            .map(option => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
                     </select>
                 </div>
             </div>

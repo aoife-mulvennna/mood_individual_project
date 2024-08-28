@@ -83,7 +83,8 @@ const MyRecord = () => {
             )}
 
             <div className="p-6 theme-secondary-bg rounded-none shadow-sm border theme-border mb-6">
-                <h3 className="text-lg font-semibold mb-4 theme-primary-text border-b theme-border pb-2">Mood and Activity Trends</h3>
+                <h3 className="text-lg font-semibold mb-2 theme-primary-text">Mood and Activity Trends</h3>
+                <div className="text-m border-b theme-border pb-2 mb-4 ">This chart shows how your metrics have changed over time. Choose the metrics and time periods using the check boxes.</div>
                 <DateChart studentId={studentId} />
             </div>
 

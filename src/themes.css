@@ -1,5 +1,6 @@
 /* themes.css */
 :root {
+  /* Light Theme */
   --theme-primary-bg: white;
   --theme-primary-text: black;
   --theme-secondary-bg: #f9f9f9;
@@ -7,19 +8,15 @@
   --theme-button-bg: #df2626;
   --theme-button-text: white;
   --theme-topbar-bg: #f1f1f1;
-  --theme-accent-color: #df2626;
-  --theme-active-link: #df2626;
-  --theme-button-secondary: #df2626;
-   --theme-text-ternary: rgb(0, 0, 0);
-  --theme-hover-text: #df2626;
-  --theme-hover-bg: white;
+  --theme-active-bg: #aaaaaa;
+  --theme-active-txt: #000000;
+  --theme-hover-bg: #df2626;
+  --theme-hover-text: white;
   --theme-hover-signout-bg: rgb(170, 170, 170);
-  --theme-signout-bg: #df2626;
+  --theme-signout-bg: #d2d2d2;
   --theme-border: #b3acac;
-  --theme-nav-bg:#d2d2d2;
-  --theme-nav-txt: rgb(0, 0, 0);
-  --theme-active-txt:#000000;
-  --theme-active-bg: #6f2727;
+  --theme-nav-bg: #d2d2d2;
+  --theme-nav-txt: #000000;
 }
 
 [data-theme="dark"] {
@@ -168,28 +165,17 @@ button.submit-button.theme-button-bg.theme-button-text:hover {
 }
 
 .signout-button {
-  background-color: var(--theme-button-bg);
-  color: var(--theme-button-text);
-  border: none;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 4px;
+  background-color: var(--theme-signout-bg);
+  color: var(--theme-signout-text);
   transition: background-color 0.3s ease, font-weight 0.3s ease;
-  /* Smooth transition */
 }
 
 .signout-button:hover {
   background-color: var(--theme-hover-signout-bg);
-  /* Pink-themed hover color */
   color: var(--theme-button-text);
 }
 
-.theme-border {
-  border-color: var(--theme-border) !important;
-
+button:hover {
+  opacity: 0.8;
 }
+

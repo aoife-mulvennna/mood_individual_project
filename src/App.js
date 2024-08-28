@@ -52,14 +52,14 @@ const Main = () => {
     <div className="App font-sans relative ">
       {showTopBar && token && (
         <>
-          <div className="top-bar flex justify-between items-center theme-topbar-bg h-20 px-6">
+          <div className="top-bar flex justify-between items-center theme-topbar-bg h-20 px-4 sm:px-6">
             {/* Left Section: Logo, Title, and Navigation Links */}
-            <div className="flex items-center gap-8">
-              <div className="flex items-center mr-6">
+            <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+              <div className="flex items-center mr-4">
                 <img src={qubLogo} className="logo w-32 h-auto mr-2 mt-3" alt="qub logo" />
                 <div className="theme-primary-text text-2xl font-bold">QUB Student Pulse</div>
               </div>
-              <nav className="navbar flex gap-2">
+              <nav className="navbar hidden lg:flex gap-1 sm:gap-2">
                 <NavLink
                   className={({ isActive }) => (isActive ? 'nav-link active-link theme-active-txt theme-active-bg' : 'nav-link theme-nav-bg theme-nav-txt')}
                   to="/dashboard"
@@ -88,12 +88,12 @@ const Main = () => {
             </div>
 
             {/* Right Section: Account and Sign Out */}
-            <div className="flex items-center hidden lg:flex lg:w-0 lg:items-center lg:justify-end lg:flex-1 lg:gap-x-6">
+            <div className="hidden lg:flex items-center gap-2 sm:gap-x-4">
               <NavLink
                 className={({ isActive }) =>
                   isActive
-                    ? 'nav-link active-link theme-active-txt theme-active-bg flex items-center gap-2'
-                    : 'nav-link theme-nav-bg theme-nav-txt flex items-center gap-2'
+                    ? 'nav-link active-link theme-active-txt theme-active-bg flex items-center gap-2 px-4 py-2'
+                    : 'nav-link theme-nav-bg theme-nav-txt flex items-center gap-2 px-4 py-2'
                 }
                 to="/my-account"
               >
@@ -113,25 +113,18 @@ const Main = () => {
                 </svg>
                 <span>Account</span>
               </NavLink>
-              <NavLink className="signout-button" to="/logout">
-                Sign out
+              <NavLink className="signout-button theme-nav-bg theme-nav-txt flex gap-2 items-center px-3 py-2" to="/logout">
+                <span>Sign out</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                </svg>
+
               </NavLink>
             </div>
 
             <div className="lg:hidden">
               <button
-                className="theme-button-bg theme-button-text px-3 py-2 rounded"
-                onClick={toggleSidebar}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="lg:hidden">
-              <button
-                className="theme-button-bg theme-button-text px-3 py-2 rounded"
+                className="theme-button-bg theme-button-text px-3 py-2"
                 onClick={toggleSidebar}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
@@ -142,8 +135,8 @@ const Main = () => {
           </div>
 
 
-          <div className={`sidebar fixed top-0 right-0 h-full w-64 theme-primary-bg theme-primary-text p-6 transform ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-in-out`}>
-            <button className="mb-4 theme-button-bg theme-button-text px-3 py-2 rounded" onClick={toggleSidebar}>Close</button>
+          <div className={`sidebar fixed top-0 right-0 h-full w-64 theme-primary-bg theme-primary-text p-6 transform ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-in-out l`}>
+            <button className="mb-4 theme-button-bg theme-button-text px-3 py-2" onClick={toggleSidebar}>Close</button>
             <nav className="flex flex-col gap-4">
               <NavLink
                 className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}

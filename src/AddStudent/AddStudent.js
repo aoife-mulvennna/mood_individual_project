@@ -147,7 +147,7 @@ const AddStudentForm = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white p-8 rounded-lg w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mt-4 mb-4">
+            <div className="bg-white p-8 w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mt-4 mb-4">
 
                 <h2 className="text-2xl font-bold text-center mb-6 text-black">Create New Account</h2>
                 {successMessage && (
@@ -177,7 +177,7 @@ const AddStudentForm = () => {
                             }
                           }}
                           required
-                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         />
                     </div>
                     <div className="mb-4">
@@ -189,7 +189,7 @@ const AddStudentForm = () => {
                             value={studentName}
                             onChange={(e) => setStudentName(e.target.value)}
                             required
-                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         />
                     </div>
                     <div className="mb-4">
@@ -201,7 +201,7 @@ const AddStudentForm = () => {
                             value={dateOfBirth}
                             onChange={(e) => setDateOfBirth(e.target.value)}
                             required
-                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         />
                     </div>
                     <div className="mb-4">
@@ -213,7 +213,7 @@ const AddStudentForm = () => {
                             value={studentEmail}
                             onChange={(e) => setStudentEmail(e.target.value)}
                             required
-                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         />
                     </div>
                     <div class="relative mb-4">
@@ -221,7 +221,7 @@ const AddStudentForm = () => {
                             Course Name
                         </label>
                         <select
-                            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 sm:text-sm rounded leading-tight focus:outline-none focus:border-red-500"
+                            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 sm:text-sm leading-tight focus:outline-none focus:border-red-500"
                             value={selectedCourseName}
                             onChange={(e) => setSelectedCourseName(e.target.value)}
                             required
@@ -248,7 +248,7 @@ const AddStudentForm = () => {
                             value={selectedCourseYear}
                             onChange={(e) => setSelectedCourseYear(e.target.value)}
                             required
-                            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 sm:text-sm rounded leading-tight focus:outline-none focus:border-red-500"
+                            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 sm:text-sm leading-tight focus:outline-none focus:border-red-500"
                         >
                             <option value="">Select Course Year</option>
                             {courseYears.map((year) => (
@@ -272,7 +272,7 @@ const AddStudentForm = () => {
                             value={studentPassword}
                             onChange={handlePasswordChange}
                             required
-                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md  focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         />
                         <span
                             onClick={() => togglePasswordVisibility('studentPassword')}
@@ -299,7 +299,7 @@ const AddStudentForm = () => {
                             value={confirmPassword}
                             onChange={handleConfirmPasswordChange}
                             required
-                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md  focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         />
                         <span
                             onClick={() => togglePasswordVisibility('confirmPassword')}
@@ -323,7 +323,7 @@ const AddStudentForm = () => {
                     <div className="flex justify-center mb-4">
                         <button
                             type="submit"
-                            className="bg-red-500 text-white px-6 py-2 rounded-md font-semibold hover:bg-red-600 transition"
+                            className="bg-red-500 text-white px-6 py-2 font-semibold hover:bg-red-600 transition"
                             disabled={!passwordsMatch}
                         >
                             Create Account
