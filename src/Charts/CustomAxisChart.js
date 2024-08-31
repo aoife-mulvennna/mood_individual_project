@@ -73,6 +73,7 @@ const CustomAxisChart = ({ studentId }) => {
     const [exerciseNameMap, setExerciseNameMap] = useState({});
     const [sleepNameMap, setSleepNameMap] = useState({});
     const [socialisationNameMap, setSocialisationNameMap] = useState({});
+    const [trendMessage, setTrendMessage] = useState('');
 
     useEffect(() => {
         if (studentId) {
@@ -156,7 +157,36 @@ const CustomAxisChart = ({ studentId }) => {
     
         return dataPoints;
     };
-    
+   
+    const calculateTrend = (dataPoints) => {
+        if (dataPoints.length < 2) return 0;
+
+        let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+        dataPoints.forEach(point => {
+            sumX += point.x;
+            sumY += point.y;
+            sumXY += point.x * point.y;
+            sumX2 += point.x * point.x;
+        });
+
+        const n = dataPoints.length;
+        const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+        return slope;
+    };
+
+    useEffect(() => {
+        const dataPoints = getDataPoints();
+        const trend = calculateTrend(dataPoints);
+
+        if (trend > 0) {
+            setTrendMessage(`${xAxis.charAt(0).toUpperCase() + xAxis.slice(1)} has a positive effect on your ${yAxis}.`);
+        } else if (trend < 0) {
+            setTrendMessage(`${xAxis.charAt(0).toUpperCase() + xAxis.slice(1)} has a negative effect on your ${yAxis}.`);
+        } else {
+            setTrendMessage(`No clear trend between ${xAxis} and ${yAxis}.`);
+        }
+    }, [xAxis, yAxis, moodScores, exerciseDurations, sleepDurations, socialisationScores, productivityScores]);
+
 
     const getAxisOptions = (axis, nameMap) => ({
         type: 'linear',
@@ -246,6 +276,7 @@ const CustomAxisChart = ({ studentId }) => {
                 <Scatter data={chartData} options={options} />
             </div>
             <div className="flex flex-col items-start lg:items-center lg:justify-center space-y-2 mt-4 lg:mt-0 lg:ml-4">
+            {trendMessage && <p className="text-blue-600 font-semibold">{trendMessage}</p>}
                 <div>
                     <label className="mr-2 text-gray-700">X-Axis:</label>
                     <select value={xAxis} onChange={(e) => setXAxis(e.target.value)} className="form-select">

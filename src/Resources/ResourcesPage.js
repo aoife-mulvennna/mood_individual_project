@@ -72,6 +72,7 @@ const ResourcesPage = () => {
         <div className="max-w-7xl mx-auto mt-4 p-6 theme-primary-bg rounded-lg">
             {recommendedResources.length > 0 && (
                 <>
+                   <div className="p-6 theme-secondary-bg rounded-none shadow-sm border theme-border mb-6">
                     <h3 className="text-center text-2xl font-semibold mb-6 theme-primary-text">Recommended Resources</h3>
                     {personalisedMessage && (
                         <div className="mb-6">
@@ -94,13 +95,15 @@ const ResourcesPage = () => {
                             ))}
                         </ul>
                     </div>
+                    </div>
                 </>
             )}
 
             <h3 className="text-center text-2xl font-semibold mb-6 theme-primary-text">All Resources</h3>
             {Object.keys(groupedResources).map((topic, index) => (
                 <div key={index} className="mb-8">
-                    <h4 className="text-xl font-semibold mb-4 theme-primary-text flex items-center cursor-pointer" onClick={() => toggleTopic(topic)}>
+                        <div className="p-6 theme-secondary-bg rounded-none shadow-sm border theme-border mb-6">
+                    <h4 className="text-xl font-semibold mb-2 theme-primary-text flex items-center cursor-pointer border-b theme-border pb-2" onClick={() => toggleTopic(topic)}>
                         {topic}
                         {expandedTopics[topic] ? (
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 ml-2">
@@ -126,6 +129,7 @@ const ResourcesPage = () => {
                             ))}
                         </ul>
                     )}
+                </div>
                 </div>
             ))}
         </div>

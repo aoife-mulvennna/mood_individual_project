@@ -285,7 +285,7 @@ const DailyTrack = () => {
     return (
         <div className="max-w-7xl mx-auto mt-2 p-8 theme-primary-bg">
             <h3 className="text-3xl font-semibold mb-8 text-center theme-primary-text">Daily Tracker</h3>
-            <h3 className="text-2xl font-semibold mb-8 theme-primary-text">Hey {studentName},</h3>
+            <h3 className="text-2xl font-semibold mb-8 theme-primary-text ml-32">Hey {studentName},</h3>
             <form>
                 <div className="form-group mb-8">
                     <label className="block theme-primary-text text-lg mb-8 ml-32">How did you feel overall today?</label>
@@ -299,7 +299,7 @@ const DailyTrack = () => {
                                     <button
                                         key={mood.mood_id}
                                         type="button"
-                                        className={`btn px-3 py-2 transition mb-4 rounded-none ${selectedMood === mood.mood_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                        className={`btn w-40 h-10 transition mb-4 rounded-none ${selectedMood === mood.mood_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                         onClick={() => handleMoodSelection(mood)}
                                     >
                                         {mood.mood_name}
@@ -319,7 +319,7 @@ const DailyTrack = () => {
                                 <button
                                     key={exercise.exercise_id}
                                     type="button"
-                                    className={`btn px-3 py-2 transition mb-4 rounded-none ${selectedExercise === exercise.exercise_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    className={`btn w-40 h-10 transition mb-4 rounded-none ${selectedExercise === exercise.exercise_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                     onClick={() => handleExerciseSelection(exercise)}
                                 >
                                     {exercise.exercise_name}
@@ -338,7 +338,7 @@ const DailyTrack = () => {
                                 <button
                                     key={sleep.sleep_id}
                                     type="button"
-                                    className={`btn px-3 py-2 transition mb-4 rounded-none ${selectedSleep === sleep.sleep_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    className={`btn w-40 h-10 transition mb-4 rounded-none ${selectedSleep === sleep.sleep_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                     onClick={() => handleSleepSelection(sleep)}
                                 >
                                     {sleep.sleep_name}
@@ -357,7 +357,7 @@ const DailyTrack = () => {
                                 <button
                                     key={socialisation.socialisation_id}
                                     type="button"
-                                    className={`btn px-3 py-2 transition mb-4 rounded-none ${selectedSocialisation === socialisation.socialisation_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    className={`btn w-40 h-10 transition mb-4 rounded-none ${selectedSocialisation === socialisation.socialisation_id ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                     onClick={() => handleSocialisationSelection(socialisation)}
                                 >
                                     {socialisation.socialisation_name}
@@ -373,7 +373,7 @@ const DailyTrack = () => {
                             <button
                                 key={value}
                                 type="button"
-                                className={`btn px-3 py-2 transition mb-4 rounded-none ${selectedProductivity === value ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                className={`btn w-40 h-10 transition mb-4 rounded-none ${selectedProductivity === value ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                 onClick={() => handleProductivityChange(value)}
                             >
                                 {value}
@@ -391,7 +391,7 @@ const DailyTrack = () => {
                                 <button
                                     key={tag.tag_id}
                                     type="button"
-                                    className={`btn px-3 py-2 transition mb-2 rounded-none ${selectedTags.includes(tag.tag_id) ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
+                                    className={`btn px-3 h-10 transition mb-2 rounded-none ${selectedTags.includes(tag.tag_id) ? 'theme-button-bg theme-button-text' : 'theme-secondary-bg theme-secondary-text hover:bg-gray-300'}`}
                                     onClick={() => handleTagSelection(tag)}
                                 >
                                     {tag.tag_name}
