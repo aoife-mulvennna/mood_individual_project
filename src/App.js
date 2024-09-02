@@ -4,6 +4,7 @@ import DailyTrack from './DailyTrack/DailyTrack';
 import { AuthProvider, useAuth } from './AuthContext'; // Make sure useAuth is imported correctly
 import Login from './Login/Login';
 import ForgotPassword from './Login/ForgotPassword';
+import PrivateRoute from './PrivateRoute';
 import ResetPassword from './Login/ResetPassword';
 import AddStudent from './AddStudent/AddStudent';
 import LandingPage from './LandingPage/LandingPage';
@@ -16,7 +17,6 @@ import Logout from './Logout/Logout'; // Import Logout component
 import AddStaff from './AddStaff';
 import MyRecord from './MyRecord/MyRecord';
 import ResourcesPage from './Resources/ResourcesPage';
-import Resources from './Resources/Resources';
 import SessionExpired from './SessionExpired';
 import { ThemeProvider } from './ThemeContext';
 import './App.css';
@@ -54,7 +54,7 @@ export const Main = () => {
         <>
           <div className="top-bar flex justify-between items-center theme-topbar-bg h-20 px-4 sm:px-6">
             {/* Left Section: Logo, Title, and Navigation Links */}
-            <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+            <div className="flex items-center gap-2 sm:gap-4 ">
               <div className="flex items-center mr-4">
                 <img src={qubLogo} className="logo w-32 h-auto mr-2 mt-3" alt="qub logo" />
                 <div className="theme-primary-text text-2xl font-bold">QUB Student Pulse</div>
@@ -79,41 +79,46 @@ export const Main = () => {
                   My Results
                 </NavLink>
                 <NavLink
-                  className={({ isActive }) => (isActive ? 'nav-link active-link theme-active-txt theme-active-bg' : 'nav-link theme-nav-bg theme-nav-txt')}
-                  to="/resources"
-                >
-                  Resources
-                </NavLink>
+  className={({ isActive }) =>
+    isActive
+      ? 'nav-link active-link theme-active-txt theme-active-bg flex items-center gap-2 px-2 py-2 resources-link'
+      : 'nav-link theme-nav-bg theme-nav-txt flex items-center gap-2 px-2 py-2 resources-link'
+  }
+  to="/resources"
+>
+  Resources
+</NavLink>
               </nav>
             </div>
 
             {/* Right Section: Account and Sign Out */}
             <div className="hidden lg:flex items-center gap-2 sm:gap-x-4">
-              <NavLink
-                className={({ isActive }) =>
-                  isActive
-                    ? 'nav-link active-link theme-active-txt theme-active-bg flex items-center gap-2 px-4 py-2'
-                    : 'nav-link theme-nav-bg theme-nav-txt flex items-center gap-2 px-4 py-2'
-                }
-                to="/my-account"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                  />
-                </svg>
-                <span>Account</span>
-              </NavLink>
-              <NavLink className="signout-button theme-nav-bg theme-nav-txt flex gap-2 items-center px-3 py-2" to="/logout">
+            <NavLink
+  className={({ isActive }) =>
+    isActive
+      ? 'nav-link active-link theme-active-txt theme-active-bg flex items-center gap-2 px-2 py-2 account-link'
+      : 'nav-link theme-nav-bg theme-nav-txt flex items-center gap-2 px-2 py-2 account-link'
+  }
+  to="/my-account"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth="1.5"
+    stroke="currentColor"
+    className="w-6 h-6"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+    />
+  </svg>
+  <span>Account</span>
+</NavLink>
+
+              <NavLink className="signout-button theme-nav-bg theme-nav-txt flex gap-2 items-center px-2 py-2 nav-link" to="/logout">
                 <span>Sign out</span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
@@ -197,16 +202,17 @@ const Content = () => {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/create-account" element={<AddStudent />} />
-      <Route path="/daily" element={<DailyTrack />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/info" element={<Info />} /> {/* Route to Info page */}
-      <Route path="/my-account" element={<MyAccount />} /> {/* Route to My Account page */}
-      <Route path="/logout" element={<Logout />} />
-      <Route path="/contact-us" element={<ContactUs />} />
-      <Route path="/add-staff" element={<AddStaff />} />
-      <Route path="/my-records" element={<MyRecord />} />
+      {/*Private Routes */}
+      <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
+      <Route path="/dailytrack" element={<PrivateRoute element={<DailyTrack />} />} />
+      <Route path="/my-records" element={<PrivateRoute element={<MyRecord />} />} />
+      <Route path="/resources" element={<PrivateRoute element={<ResourcesPage />} />} />
+      <Route path="/info" element={<PrivateRoute element={<Info />} />} />
+      <Route path="/my-account" element={<PrivateRoute element={<MyAccount />} />} />
+      <Route path="/logout" element={<PrivateRoute element={<Logout />} />} />
+      <Route path="/contact-us" element={<PrivateRoute element={<ContactUs />} />} />
+      <Route path="/add-staff" element={<PrivateRoute element={<AddStaff />} />} />
       <Route path="/session-expired" element={<SessionExpired />} />
-      <Route path="/resources" element={<ResourcesPage />} />
     </Routes>
   );
 }

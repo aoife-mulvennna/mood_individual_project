@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext();
@@ -8,23 +8,29 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setUser(decoded);
-        if (isTokenExpired(decoded)) {
+    const checkTokenValidity = () => {
+      if (token) {
+        try {
+          const decoded = jwtDecode(token);
+          setUser(decoded);
+          if (isTokenExpired(decoded)) {
+            handleSessionExpired();
+          }
+        } catch (error) {
+          console.error('Invalid token:', error);
           handleSessionExpired();
         }
-      } catch (error) {
-        console.error('Invalid token:', error);
-        handleSessionExpired();
+      } else {
+        setUser(null);
       }
-    } else {
-      setUser(null);
-    }
-  }, [token]);
+    };
+
+    checkTokenValidity();
+  }, [token, location.pathname]);  // Added location.pathname as a dependency
+
 
   const isTokenExpired = (decodedToken) => {
     return decodedToken.exp * 1000 < Date.now();

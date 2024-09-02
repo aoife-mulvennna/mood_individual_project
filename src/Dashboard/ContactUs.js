@@ -110,14 +110,14 @@ const ContactUs = () => {
         <div className="flex justify-center mb-4 space-x-4">
           <button
             type="button"
-            className="bg-gray-500 text-white px-4 py-2font-semibold hover:bg-gray-600 transition"
-            onClick={() => navigate('/')}
+            className="theme-nav-bg theme-nav-txt px-4 py-2 font-semibold theme-hover-bg theme-hover-text transition"
+            onClick={() => navigate('/dashboard')}
           >
             Go Back
           </button>
           <button
             type="submit"
-            className="bg-blue-500 text-white px-4 py-2 font-semibold hover:bg-blue-600 transition"
+            className="theme-button-bg theme-button-text px-4 py-2 font-semibold theme-hover-bg theme-hover-text transition"
           >
             Send Email
           </button>

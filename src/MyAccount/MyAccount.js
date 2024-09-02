@@ -120,7 +120,7 @@ const MyAccount = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto mt-4 p-6 theme-bg-primary rounded-lg">
+    <div className="max-w-4xl mx-auto mt-4 p-6 theme-bg-primary">
       <h3 className="text-3xl font-semibold mb-4 text-center theme-text-primary">My Account</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
@@ -141,7 +141,7 @@ const MyAccount = () => {
                 id="currentPassword"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full px-3 py-2 border rounded"
+                className="w-full px-3 py-2 border"
                 required
               />
               <span
@@ -167,7 +167,7 @@ const MyAccount = () => {
                 id="newPassword"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-3 py-2 border rounded"
+                className="w-full px-3 py-2 border"
                 required
               />
               <span
@@ -193,7 +193,7 @@ const MyAccount = () => {
                 id="confirmPassword"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-3 py-2 border rounded"
+                className="w-full px-3 py-2 border"
                 required
               />
               <span
@@ -215,14 +215,14 @@ const MyAccount = () => {
             {passwordChangeError && <p className="text-red-500">{passwordChangeError}</p>}
             {passwordChangeSuccess && <p className="text-green-500">{passwordChangeSuccess}</p>}
             <div className="text-center">
-              <button type="submit" className="block appearance-none w-full theme-button-bg theme-text-ternary py-2 px-3 pr-8 sm:text-sm rounded leading-tight focus:outline-none focus:border-red-500">Change Password</button>
+              <button type="submit" className="block appearance-none w-full theme-button-bg theme-text-ternary py-2 px-3 pr-8 sm:text-sm leading-tight focus:outline-none focus:border-red-500">Change Password</button>
             </div>
           </form>
         </div>
       </div>
       <div className="mt-6 relative">
         <label htmlFor="theme" className="block theme-primary-text">Theme</label>
-        <select id="theme" value={theme} onChange={handleThemeChange} className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-1.5 px-3 pr-8 sm:text-sm rounded leading-tight focus:outline-none focus:border-red-500">
+        <select id="theme" value={theme} onChange={handleThemeChange} className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-1.5 px-3 pr-8 sm:text-sm leading-tight focus:outline-none focus:border-red-500 rounded-none">
           <option value="light">Light</option>
           <option value="dark">Dark</option>
           <option value="pink">Pink</option>

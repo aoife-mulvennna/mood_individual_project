@@ -39,6 +39,8 @@
   --theme-nav-txt: white;
   --theme-active-txt:#444444;
   --theme-active-bg: #b9b3b3;
+  --theme-hover-signout-bg: rgb(170, 170, 170);
+  --theme-signout-bg:#444444;
 }
 
 [data-theme="pink"] {
@@ -61,6 +63,8 @@
   --theme-nav-txt: rgb(0, 0, 0);
   --theme-active-txt:#444444;
   --theme-active-bg: #ffffff;
+  --theme-hover-signout-bg: #d07885;
+  --theme-signout-bg:#ffb6c1;
 }
 
 body {
@@ -168,6 +172,8 @@ button.submit-button.theme-button-bg.theme-button-text:hover {
   background-color: var(--theme-signout-bg);
   color: var(--theme-signout-text);
   transition: background-color 0.3s ease, font-weight 0.3s ease;
+  max-width: 120px; 
+  white-space: nowrap;
 }
 
 .signout-button:hover {
@@ -179,3 +185,41 @@ button:hover {
   opacity: 0.8;
 }
 
+
+.navbar .nav-link {
+  max-width: 120px; /* Set a maximum width */
+  white-space: nowrap; /* Prevent text from wrapping to the next line */
+  overflow: hidden; /* Hide overflow */
+   /* Add ellipsis (…) if the text overflows */
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    display: none; /* Hide the navigation links */
+  }
+
+  .menu-button {
+    display: inline-block; /* Show the menu button */
+  }
+}
+
+.menu-button {
+  display: none; /* Hide the menu button by default */
+  background-color: #f8f8f8;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.navbar {
+  display: flex;
+  gap: 1rem; /* Adjust the value as needed */
+}
+
+.nav-link.account-link {
+  margin-left: 1rem; /* Adjust the value as needed */
+}
+
+.nav-link.resources-link {
+  margin-right: 1rem; /* Adjust the value as needed */
+}

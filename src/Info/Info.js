@@ -3,7 +3,7 @@ import './Info.css';
 
 const Info = () => {
   return (
-    <div className="max-w-4xl mx-auto mt-4 p-6 theme-primary-bg rounded-lg">
+    <div className="max-w-4xl mx-auto mt-4 p-6 theme-primary-bg rounded-none">
 
       <h1 className="text-3xl font-semibold mb-6 theme-primary-text text-center">Info</h1>
       <div className="theme-secondary-text">

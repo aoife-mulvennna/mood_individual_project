@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import DailyTrack from './DailyTrack';
 
@@ -15,16 +15,22 @@ test('renders DailyTrack component without crashing', () => {
 });
 
 // Mock the fetch function globally
-global.fetch = jest.fn(() =>
-    Promise.resolve({
+global.fetch = jest.fn((url) => {
+    if (url.includes('mood')) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve([
+          { mood_id: 1, mood_name: 'Happy', mood_score: 5 },
+          { mood_id: 2, mood_name: 'Sad', mood_score: 1 }
+        ]),
+      });
+    }
+    return Promise.resolve({
       ok: true,
-      json: () => Promise.resolve([
-        { mood_id: 1, mood_name: 'Happy', mood_score: 5 },
-        { mood_id: 2, mood_name: 'Sad', mood_score: 1 }
-      ]),
-    })
-  );
-
+      json: () => Promise.resolve([]),
+    });
+  });
+  
   
 /**
  * Test: Renders mood options in DailyTrack component

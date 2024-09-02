@@ -49,16 +49,16 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg max-w-md w-full">
-        <h3 className="text-2xl font-bold text-center mb-6 text-black">Please Log In</h3>
+      <div className="bg-white p-8 max-w-md w-full">
+        <h3 className="text-3xl font-bold text-center mb-6 text-black">Please Log In</h3>
         {errorMessage && (
-          <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-center">
+          <div className="bg-red-100 text-red-700 p-3 mb-4 text-center">
             {errorMessage}
           </div>
         )}
         <form className="space-y-4" onSubmit={handleLogin}>
           <div>
-            <label className="block text-sm font-medium text-gray-800">Student Number</label>
+            <label className="block text-lg font-medium text-gray-800">Student Number</label>
             <input
               type="text"
               value={studentNumber}
@@ -70,17 +70,17 @@ const Login = () => {
                 }
               }}
               required
-              className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+              className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
             />
           </div>
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-800">Password</label>
+            <label className="block text-lg  font-medium text-gray-800">Password</label>
             <input
               type={visiblePassword ? "text" : "password"}
               value={studentPassword}
               onChange={(e) => setStudentPassword(e.target.value)}
               required
-              className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+              className="text-gray-700 mt-1 block w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
             />
             <span
               onClick={togglePasswordVisibility}
@@ -101,16 +101,16 @@ const Login = () => {
           <div className="flex items-center justify-between">
             <button
               type="submit"
-              className="bg-red-500 text-white px-4 py-2 rounded-md font-semibold hover:bg-red-600 transition"
+              className="bg-red-500 text-white px-4 py-2 font-semibold hover:bg-red-600 transition text-lg "
             >
-              Submit
+            Log In
             </button>
-            <Link to="/create-account" className="text-sm text-red-500 hover:underline">
-              Don't have an account? Sign up here
+            <Link to="/create-account" className="text-m text-red-500 hover:underline">
+              Don't have an account? <strong>Sign up here</strong>
             </Link>
           </div>
           <div className="text-center mt-4">
-            <Link to="/forgot-password" className="text-sm text-gray-600 hover:underline">
+            <Link to="/forgot-password" className="text-m text-gray-600 hover:underline">
               Forgot your password? Click here to reset it.
             </Link>
           </div>
@@ -118,7 +118,7 @@ const Login = () => {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="text-sm text-gray-600 hover:underline"
+              className="text-m text-gray-600 hover:underline"
             >
               Go back
             </button>
