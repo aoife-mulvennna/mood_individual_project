@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
+import 'chartjs-adapter-date-fns';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -11,7 +12,6 @@ import {
     Legend,
     TimeScale
 } from 'chart.js';
-import 'chartjs-adapter-date-fns';
 import { variables } from '../Variables';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale);

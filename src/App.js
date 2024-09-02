@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Route, Routes, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { DailyTrack } from './DailyTrack/DailyTrack';
+import DailyTrack from './DailyTrack/DailyTrack';
 import { AuthProvider, useAuth } from './AuthContext'; // Make sure useAuth is imported correctly
 import Login from './Login/Login';
 import ForgotPassword from './Login/ForgotPassword';
@@ -33,7 +33,7 @@ function App() {
   );
 }
 
-const Main = () => {
+export const Main = () => {
   const { token, logout } = useAuth(); // Ensure useAuth is correctly imported
   const location = useLocation();
   const showTopBar = location.pathname !== '/login' && location.pathname !== '/create-account' && location.pathname !== '/' && location.pathname !== '/logout';
@@ -76,7 +76,7 @@ const Main = () => {
                   className={({ isActive }) => (isActive ? 'nav-link active-link theme-active-txt theme-active-bg' : 'nav-link theme-nav-bg theme-nav-txt')}
                   to="/my-records"
                 >
-                  My Records
+                  My Results
                 </NavLink>
                 <NavLink
                   className={({ isActive }) => (isActive ? 'nav-link active-link theme-active-txt theme-active-bg' : 'nav-link theme-nav-bg theme-nav-txt')}
@@ -157,7 +157,7 @@ const Main = () => {
                 to="/my-records"
                 onClick={toggleSidebar}
               >
-                My Records
+                My Results
               </NavLink>
               <NavLink
                 className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}

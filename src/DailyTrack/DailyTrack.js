@@ -50,7 +50,7 @@ const DailyTrack = () => {
                     setIsFading(false); // Reset fading state
                 }, 500); // Match this time to the CSS transition duration (0.5s)
 
-            }, 14500); // Start fading after 14.5 seconds, then fade-out over 0.5 seconds (total 15s)
+            }, 14500); 
 
             return () => clearTimeout(timer);
         }
@@ -422,4 +422,4 @@ const DailyTrack = () => {
     );
 };
 
-export { DailyTrack };
+export default DailyTrack;

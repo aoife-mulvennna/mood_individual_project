@@ -1,0 +1,2 @@
+// This is a mock for chartjs-adapter-date-fns
+module.exports = {};

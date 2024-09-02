@@ -69,7 +69,7 @@ const MyRecord = () => {
 
     return (
         <div className="max-w-7xl mx-auto mt-2 p-6 theme-primary-bg">
-            <h3 className="text-center text-2xl font-semibold mb-6 theme-primary-text">Personal Records Overview</h3>
+            <h3 className="text-center text-3xl font-semibold mb-6 theme-primary-text">Your Results</h3>
 
             {insights.length > 0 && (
                 <div className="p-6 theme-secondary-bg rounded-none shadow-sm border theme-border mb-6">
