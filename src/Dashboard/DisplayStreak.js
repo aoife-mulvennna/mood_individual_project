@@ -11,7 +11,6 @@ const StreakDisplay = ({ studentId }) => {
     }, [studentId]);
 
     const fetchStreak = async (studentId) => {
-        console.log(`Fetching streak for studentId: ${studentId}`);
         try {
             const response = await fetch(`${variables.API_URL}streak/${studentId}`, {
                 headers: {
@@ -20,7 +19,6 @@ const StreakDisplay = ({ studentId }) => {
             });
             const data = await response.json();
             if (response.ok) {
-                console.log(`Fetched streak successfully: ${data.streakValue}`);
                 setStreakValue(data.streakValue);
             } else {
                 console.error('Error fetching streak:', data.message);

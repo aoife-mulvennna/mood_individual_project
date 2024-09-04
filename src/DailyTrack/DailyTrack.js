@@ -50,12 +50,12 @@ const DailyTrack = () => {
                     setIsFading(false); // Reset fading state
                 }, 500); // Match this time to the CSS transition duration (0.5s)
 
-            }, 14500); 
+            }, 14500);
 
             return () => clearTimeout(timer);
         }
     }, [errorMessage, successMessage]);
-    
+
     const fetchSavedSelections = async (id, token) => {
         try {
             const response = await fetch(variables.API_URL + `daily-track/${id}`, {
@@ -220,12 +220,17 @@ const DailyTrack = () => {
     };
 
     const handleSubmit = async () => {
+        console.log('mood: ', selectedMood);
+        console.log('exercise: ', selectedExercise);
+        console.log('sleep: ', selectedSleep);
+        console.log('socialisation: ', selectedSocialisation);
+        console.log('productivity: ', selectedProductivity);
         if (
-            !selectedMood ||
-            !selectedExercise ||
-            !selectedSleep ||
-            !selectedSocialisation ||
-            !selectedProductivity
+            selectedMood === null || selectedMood === undefined ||
+            selectedExercise === null || selectedExercise === undefined ||
+            selectedSleep === null || selectedSleep === undefined ||
+            selectedSocialisation === null || selectedSocialisation === undefined ||
+            selectedProductivity === null || selectedProductivity === undefined
         ) {
             setErrorMessage('Please complete all required fields.');
             setSuccessMessage('');

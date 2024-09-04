@@ -68,7 +68,7 @@ export const Main = () => {
                 </NavLink>
                 <NavLink
                   className={({ isActive }) => (isActive ? 'nav-link active-link theme-active-txt theme-active-bg' : 'nav-link theme-nav-bg theme-nav-txt')}
-                  to="/daily"
+                  to="dailytrack"
                 >
                   Daily Tracker
                 </NavLink>
@@ -152,7 +152,7 @@ export const Main = () => {
               </NavLink>
               <NavLink
                 className={({ isActive }) => (isActive ? 'nav-link active-link theme-primary-text theme-active-link' : 'nav-link theme-primary-text')}
-                to="/daily"
+                to="/dailytrack"
                 onClick={toggleSidebar}
               >
                 Daily Tracker
