@@ -33,8 +33,7 @@ const QuickTrack = ({ onEntryComplete }) => {
 
     useEffect(() => {
         const storedToken = sessionStorage.getItem('token');
-        const userId = sessionStorage.getItem('userId'); // Retrieve student ID
-        console.log('Component mounted, calling refreshMoods using userId:', userId, 'and for token:', token);
+        const userId = sessionStorage.getItem('userId'); 
         if (storedToken && userId) {
             console.log('Token and userId found, setting token and calling checkCooldown');
             setToken(storedToken);

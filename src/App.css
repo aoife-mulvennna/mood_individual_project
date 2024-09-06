@@ -5,6 +5,10 @@
 
 .top-bar {
   padding:20px; /* Horizontal padding */
+  width: 100%; /* Make sure the top-bar uses full width */
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Align items vertically */
 }
 
 .logo {
@@ -13,8 +17,20 @@
   margin-right: 10px;
 }
 
+.navbar {
+ 
+  flex-wrap: nowrap; /* Prevent items from wrapping */
+  gap: 1rem; /* Add sufficient space between items */
+}
+
+/* Ensure links don't shrink */
+.navbar .nav-link {
+  flex-shrink: 0; 
+  padding: 0.5rem 1rem; /* Ensure spacing inside the links */
+}
 
 
 
-
-
+.sidebar{
+  z-index: 50;
+}

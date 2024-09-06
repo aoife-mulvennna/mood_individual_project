@@ -92,7 +92,7 @@ const Stats = ({ studentId, refreshTrigger }) => {
     
 
     return (
-        <div className="max-w-md p-6 theme-secondary-bg rounded-none shadow-sm border theme-border">
+        <div className="p-6 theme-secondary-bg rounded-none shadow-sm border theme-border relative">
             <div className="flex items-center justify-center mb-2">
                 <h5 className="text-lg font-semibold theme-primary-text flex items-center">Stats
                     <p className="mx-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">

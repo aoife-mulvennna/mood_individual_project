@@ -23,7 +23,8 @@ const MyAssignments = ({ studentId }) => {
         })
             .then(response => response.json())
             .then(data => {
-                const filteredAssignments = data.assignments.filter(assignment => new Date(assignment.assignment_deadline) >= new Date());
+                const filteredAssignments = data.assignments.filter(assignment => 
+                    new Date(assignment.assignment_deadline) >= new Date());
                 setAssignments(filteredAssignments);
             })
             .catch(error => console.error('Error fetching assignments:', error));
@@ -177,7 +178,7 @@ const MyAssignments = ({ studentId }) => {
                         value={newAssignment.name}
                         onChange={handleInputChange}
                         placeholder="Assignment Name"
-                        className="mb-2 p-2 border rounded w-full"
+                        className="mb-2 p-2 border rounded w-full text-black"
                     />
                     <input
                         type="date"
@@ -185,7 +186,7 @@ const MyAssignments = ({ studentId }) => {
                         value={newAssignment.date}
                         onChange={handleInputChange}
                         placeholder="Assignment Date"
-                        className="mb-2 p-2 border rounded w-full"
+                        className="mb-2 p-2 border rounded w-full text-black"
                     />
                     <div className="flex justify-end">
                         <button

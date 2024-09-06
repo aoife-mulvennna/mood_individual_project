@@ -120,7 +120,6 @@ const CustomAxisChart = ({ studentId }) => {
 
     const getDataPoints = () => {
         const dataPoints = [];
-    
         const allDates = [...new Set([
             ...moodScores.map(record => record.record_timestamp),
             ...exerciseDurations.map(record => record.daily_record_timestamp),

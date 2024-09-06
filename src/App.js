@@ -54,7 +54,7 @@ export const Main = () => {
         <>
           <div className="top-bar flex justify-between items-center theme-topbar-bg h-20 px-4 sm:px-6">
             {/* Left Section: Logo, Title, and Navigation Links */}
-            <div className="flex items-center gap-2 sm:gap-4 ">
+            <div className="flex items-center gap-2 sm:gap-2">
               <div className="flex items-center mr-4">
                 <img src={qubLogo} className="logo w-32 h-auto mr-2 mt-3" alt="qub logo" />
                 <div className="theme-primary-text text-2xl font-bold">QUB Student Pulse</div>

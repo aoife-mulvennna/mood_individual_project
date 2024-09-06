@@ -29,12 +29,11 @@ const generateDateRange = (startDate, endDate) => {
 const aggregateByDate = (data, key) => {
     const result = {};
     data.forEach(record => {
-        const timestamp = record.record_timestamp || record.daily_record_timestamp;  // Ensure using the correct field
+        const timestamp = record.record_timestamp || record.daily_record_timestamp;
         if (!timestamp || isNaN(new Date(timestamp).getTime())) {
             console.warn(`Invalid or missing timestamp encountered:`, record);
             return;
         }
-
         const date = new Date(timestamp).toISOString().split('T')[0];
         if (!result[date]) {
             result[date] = { count: 0, total: 0 };
@@ -42,7 +41,6 @@ const aggregateByDate = (data, key) => {
         result[date].count += 1;
         result[date].total += record[key];
     });
-
     return Object.keys(result).map(date => ({
         x: new Date(date),
         y: result[date].total / result[date].count,

@@ -14,9 +14,6 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    console.log('Attempting login with:', { studentNumber, studentPassword });
-
     try {
       const response = await fetch(variables.API_URL + 'login/student', {
         method: 'POST',
@@ -27,14 +24,12 @@ const Login = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        login(data.token); // Assuming login sets the token in context
-        sessionStorage.setItem('token', data.token); // Store token in sessionStorage
-        console.log('Login successful');
+        login(data.token);
+        sessionStorage.setItem('token', data.token); 
         navigate('/dashboard');
       } else {
         console.log('Login failed:', data.message);
-        // alert(`Login failed: ${data.message}`);
-        setErrorMessage('Incorrect student number or password. Please try again.'); // Set the error message
+        setErrorMessage('Incorrect student number or password. Please try again.'); 
       }
     } catch (error) {
       console.error('Login error:', error);

@@ -98,12 +98,12 @@ const ContactUs = () => {
       )}
       <form onSubmit={handleSendEmail}>
         <div className="mb-4">
-          <label className="block text-gray-700 font-medium mb-2">Message</label>
+          <label className="block text-black font-medium mb-2">Message</label>
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300"
+            className="w-full px-3 py-2 border border-gray-300 text-black"
             rows="6"
           />
         </div>

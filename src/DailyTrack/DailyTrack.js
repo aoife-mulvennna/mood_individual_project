@@ -63,11 +63,8 @@ const DailyTrack = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-
             if (response.status === 404) {
-                // No record found for today, reset selections to defaults
                 console.log('No daily record found for today.');
-                // Ensure the form is in a state to accept new data
                 setSelectedMood('');
                 setSelectedExercise('');
                 setSelectedSleep('');
@@ -78,16 +75,13 @@ const DailyTrack = () => {
             } else if (!response.ok) {
                 throw new Error('Failed to fetch saved selections');
             }
-
             const data = await response.json();
-
             setSelectedMood(data.mood_id);
             setSelectedExercise(data.exercise_id);
             setSelectedSleep(data.sleep_id);
             setSelectedSocialisation(data.socialisation_id);
             setSelectedProductivity(data.productivity_score);
             setSelectedTags(data.tags);
-
         } catch (error) {
             if (error.message !== 'Failed to fetch saved selections') {
                 console.error('Error fetching saved selections:', error);
@@ -220,11 +214,6 @@ const DailyTrack = () => {
     };
 
     const handleSubmit = async () => {
-        console.log('mood: ', selectedMood);
-        console.log('exercise: ', selectedExercise);
-        console.log('sleep: ', selectedSleep);
-        console.log('socialisation: ', selectedSocialisation);
-        console.log('productivity: ', selectedProductivity);
         if (
             selectedMood === null || selectedMood === undefined ||
             selectedExercise === null || selectedExercise === undefined ||
@@ -236,7 +225,6 @@ const DailyTrack = () => {
             setSuccessMessage('');
             return;
         }
-
         try {
             if (!token) {
                 setErrorMessage('No token found, please log in again.');

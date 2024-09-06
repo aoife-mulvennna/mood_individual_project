@@ -9,7 +9,7 @@ export const useTheme = () => {
     return useContext(ThemeContext);
 };
 
-// Theme provider component
+
 export const ThemeProvider = ({ children }) => {
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
